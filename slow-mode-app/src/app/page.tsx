@@ -7,7 +7,7 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <div className="text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-zinc-900 font-lusitana mb-8">
-          SlowMode
+          SlowMode test
         </h1>
         <Link 
           href="/login"
