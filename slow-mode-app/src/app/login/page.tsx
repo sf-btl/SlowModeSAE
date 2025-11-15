@@ -45,7 +45,7 @@ export default function Login() {
 
             {/* Lien mot de passe oublié */}
             <div className="text-right mb-6">
-              <a href="#" className="text-xs font-bold font-istok-web text-rose-800 hover:text-rose-800/80 transition-colors">
+              <a href="/forgot-password" className="text-xs font-bold font-istok-web text-rose-800 hover:text-rose-800/80 transition-colors">
                 MOT DE PASSE OUBLIÉ ?
               </a>
             </div>
@@ -68,7 +68,7 @@ export default function Login() {
             </div>
 
             <div className="text-right">
-              <a href="#" className="text-sm/9 font-bold font-istok-web text-cyan-950 hover:text-cyan-950/80 transition-colors">
+              <a href="./register" className="text-sm/9 font-bold font-istok-web text-cyan-950 hover:text-cyan-950/80 transition-colors">
                 CRÉER UN COMPTE
               </a>
             </div>
