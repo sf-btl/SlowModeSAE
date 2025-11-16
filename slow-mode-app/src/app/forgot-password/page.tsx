@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Header from '@/components/Header';
+import Button from '@/components/Button';
 import { EmailIcon } from '@/components/Icons';
 
 export default function ForgotPassword() {
@@ -81,23 +82,23 @@ export default function ForgotPassword() {
 
               {/* Bouton retour */}
               <div className="mb-8">
-                <button
+                <Button
                   onClick={handleBackToLogin}
-                  className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer"
+                  className="w-full"
                 >
                   Retour à la connexion
-                </button>
+                </Button>
               </div>
 
               {/* Renvoyer l'email */}
               <div className="text-center">
                 <span className="text-sm font-montserrat text-zinc-800">Vous n'avez rien reçu ? </span>
-                <button 
+                <Button 
+                  variant="link"
                   onClick={() => setIsEmailSent(false)}
-                  className="text-sm font-bold font-istok-web text-cyan-950 hover:text-cyan-950/80 transition-colors"
                 >
                   RENVOYER
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -150,24 +151,24 @@ export default function ForgotPassword() {
 
             {/* Bouton d'envoi */}
             <div className="mb-8">
-              <button
+              <Button
                 type="submit"
-                className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer"
+                className="w-full"
               >
                 Envoyer le lien
-              </button>
+              </Button>
             </div>
 
             {/* Retour à la connexion */}
             <div className="text-center">
               <span className="text-sm font-montserrat text-zinc-800 font-medium">Vous vous souvenez ? </span>
-              <button
+              <Button
                 type="button"
+                variant="link"
                 onClick={handleBackToLogin}
-                className="text-sm font-bold font-istok-web text-cyan-950 hover:text-cyan-950/80 transition-colors"
               >
                 SE CONNECTER
-              </button>
+              </Button>
             </div>
             
           </form>

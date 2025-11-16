@@ -1,6 +1,7 @@
 "use client";
 
 import Header from '@/components/Header';
+import Button from '@/components/Button';
 import { EmailIcon, PasswordIcon } from '@/components/Icons';
 
 export default function Login() {
@@ -52,12 +53,9 @@ export default function Login() {
 
             {/* Bouton de connexion */}
             <div className="mb-6">
-                <button
-                type="submit"
-                className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer"
-                >
-                Se connecter
-                </button>
+                <Button type="submit">
+                  Se connecter
+                </Button>
             </div>
 
             {/* Nouveau utilisateur */}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Header from '@/components/Header';
+import Button from '@/components/Button';
 import { EmailIcon, PasswordIcon, ProfilIcon, PhoneIcon, CompanyIcon, SiretIcon, ArrowBackIcon } from '@/components/Icons';
 
 export default function Register() {
@@ -410,23 +411,23 @@ export default function Register() {
 
               {/* Bouton d'inscription */}
               <div className="mb-8">
-                  <button
+                  <Button
                   type="submit"
-                  className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer"
+                  className="w-full"
                   >
                   Confirmer
-                  </button>
+                  </Button>
               </div>
 
               {/* Bouton retour (desktop seulement) */}
               <div className="text-center hidden md:block">
-                <button
+                <Button
                   type="button"
+                  variant="link"
                   onClick={() => setShowFullForm(false)}
-                  className="text-sm font-istok-web text-cyan-950 hover:text-cyan-950/80 font-semibold"
                 >
                   RETOUR
-                </button>
+                </Button>
               </div>
               
             </form>
@@ -501,13 +502,13 @@ export default function Register() {
 
             {/* Bouton Continuer */}
             <div className="mb-8">
-              <button
+              <Button
                 onClick={handleContinue}
                 disabled={!accountType || !department}
-                className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full"
               >
                 Continuer
-              </button>
+              </Button>
             </div>
 
             {/* Lien vers login */}

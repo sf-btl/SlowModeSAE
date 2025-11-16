@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
+import Loading from '@/components/Loading'
+import Button from '@/components/Button'
 import { PasswordIcon } from '@/components/Icons'
 
 export default function ResetPasswordPage() {
@@ -92,26 +94,7 @@ export default function ResetPasswordPage() {
 
   // Affichage de chargement pendant la validation du token
   if (tokenValid === null) {
-    return (
-      <div className="min-h-screen bg-white relative">
-        <Header title="Vérification..." onBack={handleBackToLogin} />
-        <div className="absolute inset-0 flex items-center justify-center px-4 py-8">
-          <div className="w-full max-w-md px-8">
-            <div className="text-center space-y-6">
-              <div className="text-left">
-                <h2 className="text-2xl text-black font-lusitana mb-4">Vérification du lien...</h2>
-                <div className="flex justify-center">
-                  <svg className="animate-spin h-8 w-8 text-cyan-950" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <Loading message="Vérification du lien..." title="Validation" />
   }
 
   if (!token || tokenValid === false) {
@@ -128,12 +111,9 @@ export default function ResetPasswordPage() {
                 </p>
               </div>
               <div className="mb-6">
-                <Link 
-                  href="/forgot-password" 
-                  className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer inline-block text-center"
-                >
+                <Button onClick={() => window.location.href = '/forgot-password'}>
                   Demander un nouveau lien
-                </Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -164,12 +144,9 @@ export default function ResetPasswordPage() {
               </div>
               
               <div className="mb-6">
-                <Link 
-                  href="/login" 
-                  className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer inline-block text-center"
-                >
+                <Button onClick={() => window.location.href = '/login'}>
                   Se connecter
-                </Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -240,13 +217,12 @@ export default function ResetPasswordPage() {
 
             {/* Bouton de mise à jour */}
             <div className="mb-6">
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 transition-colors font-lusitana text-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
-              </button>
+              </Button>
             </div>
 
             {/* Retour à la connexion */}
