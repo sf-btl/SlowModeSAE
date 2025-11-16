@@ -1,4 +1,4 @@
-# SlowMode App 🚀
+# SlowMode App 👕
 
 Application Next.js moderne avec configuration Docker pour la production.
 
@@ -22,7 +22,7 @@ cd slow-mode-app
 npm install
 ```
 
-## 🚀 Développement Local
+## 🧑‍💻 Développement Local
 
 ### Démarrage en mode développement
 ```bash
@@ -109,34 +109,6 @@ docker-compose logs -f slow-mode-prod
    ```bash
    docker-compose up -d slow-mode-prod
    ```
-
-## 📁 Structure du Projet
-
-```
-SlowModeSAE/
-├── slow-mode-app/                 # Application Next.js
-│   ├── src/
-│   │   ├── app/                   # App Router Next.js 16
-│   │   │   ├── globals.css        # Styles globaux
-│   │   │   ├── layout.tsx         # Layout principal
-│   │   │   ├── page.tsx           # Page d'accueil
-│   │   │   ├── login/             # Page de connexion
-│   │   │   ├── register/          # Page d'inscription
-│   │   │   └── forgot-password/   # Page mot de passe oublié
-│   │   └── components/            # Composants réutilisables
-│   │       ├── Header.tsx
-│   │       ├── Icons.tsx
-│   │       └── Loading.tsx
-│   ├── public/                    # Assets statiques
-│   ├── package.json               # Dépendances du projet
-│   ├── next.config.ts             # Configuration Next.js
-│   ├── tsconfig.json              # Configuration TypeScript
-│   └── postcss.config.mjs         # Configuration PostCSS
-├── Dockerfile                     # Configuration Docker production
-├── docker-compose.yml             # Orchestration Docker
-├── .dockerignore                  # Fichiers ignorés par Docker
-└── README.md                      # Documentation du projet
-```
 
 ## 🔧 Configuration
 
