@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
+import Input from '@/components/Input';
 import { EmailIcon, PasswordIcon, ProfilIcon, PhoneIcon, CompanyIcon, SiretIcon, ArrowBackIcon } from '@/components/Icons';
 
 export default function Register() {
@@ -253,112 +254,89 @@ export default function Register() {
               {accountType === 'entreprise' ? (
                 <>
                   {/* Champ Société */}
-                  <div className="relative mb-8">
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <CompanyIcon className="w-5 h-5" />
-                    </div>
-                    <input
+                  <div className="mb-8">
+                    <Input
                       id="companyName"
                       type="text"
                       required
-                      className="w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
                       placeholder="Société"
+                      icon={<CompanyIcon className="w-5 h-5" />}
                     />
                   </div>
 
                   {/* Champ N° Siret */}
-                  <div className="relative mb-8">
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <SiretIcon className="w-5 h-5" />
-                    </div>
-                    <input
+                  <div className="mb-8">
+                    <Input
                       id="siret"
                       type="text"
                       required
-                      className="w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
                       placeholder="N° Siret"
+                      icon={<SiretIcon className="w-5 h-5" />}
                     />
                   </div>
                 </>
               ) : (
                 <>
                   {/* Champ Prénom */}
-                  <div className="relative mb-8">
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <ProfilIcon className="w-5 h-5" />
-                    </div>
-                    <input
+                  <div className="mb-8">
+                    <Input
                       id="firstName"
                       type="text"
                       required
-                      className="w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
                       placeholder="Prénom"
+                      icon={<ProfilIcon className="w-5 h-5" />}
                     />
                   </div>
 
                   {/* Champ Nom */}
-                  <div className="relative mb-8">
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <ProfilIcon className="w-5 h-5" />
-                    </div>
-                    <input
+                  <div className="mb-8">
+                    <Input
                       id="lastName"
                       type="text"
                       required
-                      className="w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
                       placeholder="Nom"
+                      icon={<ProfilIcon className="w-5 h-5" />}
                     />
                   </div>
                 </>
               )}
 
               {/* Champ Email (commun à tous) */}
-              <div className="relative mb-8">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <EmailIcon className="w-5 h-5" />
-                </div>
-                <input
+              <div className="mb-8">
+                <Input
                   id="email"
                   type="email"
                   required
-                  className="w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
                   placeholder="e-mail"
+                  icon={<EmailIcon className="w-5 h-5" />}
                 />
               </div>
 
               {/* Champ Mot de passe (commun à tous) */}
-              <div className="relative mb-8">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <PasswordIcon className="w-5 h-5" />
-                </div>
-                <input
+              <div className="mb-8">
+                <Input
                   id="password"
                   type="password"
                   required
                   value={password}
                   onChange={(e) => handlePasswordChange(e.target.value)}
-                  className={`w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 ${
-                    passwordError ? 'focus:ring-rose-800/80 ring-1 ring-rose-800' : 'focus:ring-zinc-500'
-                  }`}
+                  error={!!passwordError}
                   placeholder="Mot de Passe"
+                  icon={<PasswordIcon className="w-5 h-5" />}
                 />
               </div>
 
               {/* Champ Confirmation Mot de passe (commun à tous) */}
-              <div className="relative mb-2">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <PasswordIcon className="w-5 h-5" />
-                </div>
-                <input
+              <div className="mb-2">
+                <Input
                   id="confirmPassword"
                   type="password"
                   required
                   value={confirmPassword}
                   onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-                  className={`w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 ${
-                    passwordError ? 'focus:ring-rose-800/80 ring-1 ring-rose-800' : 'focus:ring-zinc-500'
-                  }`}
+                  error={!!passwordError}
                   placeholder="Confirmer le Mot de Passe"
+                  icon={<PasswordIcon className="w-5 h-5" />}
                 />
               </div>
               
@@ -474,14 +452,14 @@ export default function Register() {
               <p className="text-xs text-zinc-600 mb-4 font-montserrat wrap-break-word max-w-54">
                 Département où sera façonné et livré votre vêtement
               </p>
-              <input
+              <Input
                 type="text"
+                id="department"
                 value={departmentInput}
                 onChange={handleDepartmentInputChange}
                 onFocus={() => setShowSuggestions(departmentInput.length > 0)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 placeholder="Tapez votre département"
-                className="w-full pl-3 pr-3 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
               />
               
               {/* Liste des suggestions */}

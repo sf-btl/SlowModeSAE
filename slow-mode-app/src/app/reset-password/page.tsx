@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Loading from '@/components/Loading'
 import Button from '@/components/Button'
+import Input from '@/components/Input'
 import { PasswordIcon } from '@/components/Icons'
 
 export default function ResetPasswordPage() {
@@ -167,42 +168,32 @@ export default function ResetPasswordPage() {
             </div>
 
             {/* Champ Nouveau mot de passe */}
-            <div className="relative mb-10">
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <PasswordIcon className="w-5 h-5" />
-              </div>
-              <input
+            <div className="mb-10">
+              <Input
                 id="password"
                 name="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 ${
-                  error ? 'focus:ring-rose-800/80 ring-1 ring-rose-800' : 'focus:ring-zinc-500'
-                }`}
+                error={!!error}
                 placeholder="Nouveau mot de passe"
+                icon={<PasswordIcon className="w-5 h-5" />}
                 minLength={6}
               />
             </div>
 
             {/* Champ Confirmer le mot de passe */}
-            <div className="relative mb-6">
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <PasswordIcon className="w-5 h-5" />
-              </div>
-              <input
-                id="confirm-password"
-                name="confirm-password"
+            <div className="mb-6">
+              <Input
+                id="confirmPassword"
                 type="password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 ${
-                  error ? 'focus:ring-rose-800/80 ring-1 ring-rose-800' : 'focus:ring-zinc-500'
-                }`}
-                placeholder="Confirmez le mot de passe"
-                minLength={6}
+                error={!!error}
+                placeholder="Confirmer le mot de passe"
+                icon={<PasswordIcon className="w-5 h-5" />}
               />
             </div>
 

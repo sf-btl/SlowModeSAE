@@ -2,6 +2,7 @@
 
 import Header from '@/components/Header';
 import Button from '@/components/Button';
+import Input from '@/components/Input';
 import { EmailIcon, PasswordIcon } from '@/components/Icons';
 
 export default function Login() {
@@ -17,30 +18,24 @@ export default function Login() {
             </div>
 
             {/* Champ Email */}
-            <div className="relative mb-10">
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <EmailIcon className="w-5 h-5" />
-              </div>
-              <input
+            <div className="mb-10">
+              <Input
                 id="email"
                 type="email"
                 required
-                className="w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
                 placeholder="e-mail"
+                icon={<EmailIcon className="w-5 h-5" />}
               />
             </div>
 
             {/* Champ Mot de passe */}
-            <div className="relative mb-6">
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <PasswordIcon className="w-5 h-5" />
-              </div>
-              <input
+            <div className="mb-6">
+              <Input
                 id="password"
                 type="password"
                 required
-                className="w-full pl-3 pr-10 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-500"
-                placeholder="Mot de Passe"
+                placeholder="mot de passe"
+                icon={<PasswordIcon className="w-5 h-5" />}
               />
             </div>
 
