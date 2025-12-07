@@ -1,0 +1,280 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// USERS & AUTHENTICATION
+// ==========================================
+
+model Utilisateur {
+  id_user         String       @id @default(uuid())
+  email           String       @unique
+  mot_de_passe    String
+  nom             String
+  prenom          String
+  adresse_postale String?
+  ville           String?
+  telephone       String?
+  notes           String?      @db.Text  // Notes personnelles libres
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  // Relations - Un utilisateur peut avoir plusieurs profils (0 à 3)
+  acheteur        Acheteur?      // Profil acheteur (peut passer des commandes)
+  couturier       Couturier?     // Profil couturier (peut s'occuper de commandes)
+  fournisseur     Fournisseur?   // Profil fournisseur (peut vendre des tissus)
+  
+  // Posts (tout utilisateur peut publier)
+  posts           Post[]
+  
+  @@map("utilisateurs")
+}
+
+// ==========================================
+// PROFILS UTILISATEURS
+// ==========================================
+
+model Acheteur {
+  id_acheteur          String   @id @default(uuid())
+  mensurations         String?  @db.Text  // Mensurations de base de l'acheteur
+  taille_habituelle    String?  // S, M, L, XL...
+  preferences_style    String?  @db.Text  // "J'aime le style bohème, couleurs chaudes"
+  allergies_textiles   String?  @db.Text  // "Allergique au polyester"
+  notes_preferences    String?  @db.Text  // Notes libres sur préférences
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  // Relations
+  id_user              String   @unique
+  utilisateur          Utilisateur @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  
+  // Commandes passées par cet acheteur
+  commandes            Commande[] @relation("AcheteurCommandes")
+  
+  @@map("acheteurs")
+}
+
+model Couturier {
+  id_couturier        String   @id @default(uuid())
+  bio_description     String?  @db.Text
+  specialites         String?  @db.Text  // Ex: "Robes de mariée, retouches, upcycling"
+  annees_experience   Int?
+  note_moyenne        Float?   @default(0)
+  conditions          String?  @db.Text  // Délais, tarifs, conditions de travail
+  portfolio_url       String?  // Lien vers portfolio externe
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  // Relations
+  id_user             String   @unique
+  utilisateur         Utilisateur @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  
+  // Commandes dont ce couturier s'occupe
+  commandes           Commande[] @relation("CouturierCommandes")
+  patrons             Patron[]
+  
+  @@map("couturiers")
+}
+
+model Fournisseur {
+  id_fournisseur       String   @id @default(uuid())
+  siret                String   @unique
+  nom_societe          String
+  description          String?  @db.Text  // Présentation de la mercerie
+  note_moyenne         Float?   @default(0)
+  conditions_livraison String?  @db.Text  // "Livraison gratuite dès 50€", délais, etc.
+  adresse_entreprise   String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  // Relations
+  id_user              String   @unique
+  utilisateur          Utilisateur @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  
+  // Catalogue de tissus
+  tissus               Tissu[]
+  
+  @@map("fournisseurs")
+}
+
+// ==========================================
+// PRODUCTS & MATERIALS
+// ==========================================
+
+model Produit {
+  id_produit      String          @id @default(uuid())
+  nom_produit     String
+  description     String?         @db.Text
+  prix_unitaire   Decimal         @db.Decimal(10, 2)
+  stock           Int             @default(0)
+  notes           String?         @db.Text  // Notes libres sur le produit
+  image_url       String?         // URL de l'image du produit
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  // Relations
+  lignesCommande  LigneCommande[]
+  
+  @@map("produits")
+}
+
+model Tissu {
+  id_tissu        String          @id @default(uuid())
+  matiere         String
+  grammage        String?
+  couleur         String?
+  motif           String?         // Uni, rayé, floral, etc.
+  metrage_dispo   Int?
+  prix_metre      Decimal?        @db.Decimal(10, 2)
+  description     String?         @db.Text  // Description libre du tissu
+  image_url       String?         // URL de l'image du tissu
+  composition     String?         @db.Text  // Ex: "95% coton, 5% élasthanne"
+  entretien       String?         @db.Text  // Instructions d'entretien
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  // Relations
+  id_fournisseur  String
+  fournisseur     Fournisseur     @relation(fields: [id_fournisseur], references: [id_fournisseur], onDelete: Cascade)
+  
+  commandeTissus  CommandeTissu[]
+  
+  @@map("tissus")
+}
+
+model Patron {
+  id_patron       String     @id @default(uuid())
+  nom_patron      String
+  description     String?    @db.Text  // Description détaillée du patron
+  difficulte      String?    // Ex: "Facile", "Moyen", "Difficile"
+  prix_digital    Decimal?   @db.Decimal(10, 2)
+  fichier_pdf     String?    // URL ou chemin vers le PDF
+  image_apercu    String?    // URL de l'image d'aperçu
+  tailles_incluses String?   @db.Text  // "Du 34 au 48", etc.
+  temps_realisation String?  // "4-6 heures"
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  
+  // Relations
+  id_couturier    String
+  couturier       Couturier  @relation(fields: [id_couturier], references: [id_couturier], onDelete: Cascade)
+  
+  @@map("patrons")
+}
+
+// ==========================================
+// ORDERS & PURCHASES
+// ==========================================
+
+enum StatutCommande {
+  EN_ATTENTE
+  CONFIRMEE
+  EN_COURS
+  PRETE
+  EXPEDIEE
+  LIVREE
+  TERMINEE
+  ANNULEE
+}
+
+model Commande {
+  id_commande           String          @id @default(uuid())
+  date_commande         DateTime        @default(now())
+  statut                StatutCommande  @default(EN_ATTENTE)
+  adresse_livraison     String?
+  montant_total         Decimal         @db.Decimal(10, 2)
+  notes_client          String?         @db.Text  // Notes libres du client
+  instructions_speciales String?        @db.Text  // Instructions pour le couturier
+  date_livraison_souhaitee DateTime?    // Date de livraison souhaitée
+  nom_destinataire      String?         // "Pour mon fils Paul", "Cadeau pour ma mère"
+  mensurations_specifiques String?      @db.Text  // Mensurations spécifiques pour CETTE commande
+  notes_mensurations    String?         @db.Text  // "Préfère ample", "Attention épaules larges"
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  
+  // Relations
+  // Acheteur qui passe la commande (OBLIGATOIRE)
+  id_acheteur           String
+  acheteur              Acheteur        @relation("AcheteurCommandes", fields: [id_acheteur], references: [id_acheteur], onDelete: Cascade)
+  
+  // Couturier qui s'occupe de la commande (OBLIGATOIRE)
+  id_couturier          String
+  couturier             Couturier       @relation("CouturierCommandes", fields: [id_couturier], references: [id_couturier], onDelete: Restrict)
+  
+  // Produits commandés (patrons, accessoires, etc.)
+  lignesCommande        LigneCommande[]
+  
+  // Tissus achetés pour cette commande (optionnel - si l'acheteur achète sur la plateforme)
+  commandeTissus        CommandeTissu[]
+  
+  @@map("commandes")
+}
+
+// Table intermédiaire pour Commande ↔ Produit (Many-to-Many)
+model LigneCommande {
+  id_ligne        String   @id @default(uuid())
+  quantite        Int      @default(1)
+  prix_unitaire   Decimal  @db.Decimal(10, 2)
+  notes           String?  @db.Text  // Notes sur cette ligne spécifique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  id_commande     String
+  commande        Commande @relation(fields: [id_commande], references: [id_commande], onDelete: Cascade)
+  
+  id_produit      String
+  produit         Produit  @relation(fields: [id_produit], references: [id_produit], onDelete: Restrict)
+  
+  @@map("lignes_commande")
+}
+
+// Table intermédiaire pour Commande ↔ Tissu (Many-to-Many)
+model CommandeTissu {
+  id_commande_tissu String   @id @default(uuid())
+  quantite_metre    Decimal  @db.Decimal(10, 2) // Quantité en mètres
+  prix_unitaire     Decimal  @db.Decimal(10, 2)
+  notes             String?  @db.Text  // Notes sur ce tissu spécifique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  id_commande       String
+  commande          Commande @relation(fields: [id_commande], references: [id_commande], onDelete: Cascade)
+  
+  id_tissu          String
+  tissu             Tissu    @relation(fields: [id_tissu], references: [id_tissu], onDelete: Restrict)
+  
+  @@map("commandes_tissus")
+}
+
+// ==========================================
+// COMMUNITY & CONTENT
+// ==========================================
+
+model Post {
+  id_post           String   @id @default(uuid())
+  titre             String
+  date_creation     DateTime @default(now())
+  date_publication  DateTime?
+  description       String?  @db.Text
+  photo_resultat    String?  // URL de l'image
+  tags              String?  // Tags séparés par virgules : "upcycling,denim,été"
+  contenu_libre     String?  @db.Text  // Contenu additionnel libre
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations - Tout utilisateur peut publier
+  id_user           String
+  utilisateur       Utilisateur @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  
+  @@map("posts")
+}

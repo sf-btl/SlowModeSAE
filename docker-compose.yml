@@ -1,4 +1,26 @@
 services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: slowmode-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: slowmode
+      POSTGRES_PASSWORD: slowmode2024
+      POSTGRES_DB: slowmode_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - slow-mode-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U slowmode"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Application Next.js 
   slow-mode-prod:
     build:
       context: .
@@ -10,15 +32,22 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
+      - DATABASE_URL=postgresql://slowmode:slowmode2024@postgres:5432/slowmode_db
     restart: unless-stopped
     networks:
       - slow-mode-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
+
+volumes:
+  postgres_data:
 
 networks:
   slow-mode-network:
