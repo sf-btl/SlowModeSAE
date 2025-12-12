@@ -22,6 +22,46 @@ cd slow-mode-app
 npm install
 ```
 
+### 3. Configuration de la base de données
+
+#### Variables d'environnement
+Créez un fichier `.env` dans `slow-mode-app/` :
+```env
+DATABASE_URL="postgresql://slowmode_user:votre_password@localhost:5432/slowmode_db"
+JWT_SECRET="votre_secret_jwt_tres_securise_changez_moi"
+```
+
+#### Installation et configuration PostgreSQL
+1. **Installez PostgreSQL** sur votre machine
+2. **Créez la base de données** :
+```bash
+psql -U postgres
+CREATE DATABASE slowmode_db;
+CREATE USER slowmode_user WITH PASSWORD 'votre_password';
+GRANT ALL PRIVILEGES ON DATABASE slowmode_db TO slowmode_user;
+\q
+```
+
+#### Migration de la base de données avec Prisma
+```bash
+cd slow-mode-app
+
+# Générer le client Prisma
+npx prisma generate
+
+# Appliquer les migrations
+npx prisma migrate deploy
+
+# Ou créer une nouvelle migration après modification du schéma
+npx prisma migrate dev --name nom_de_la_migration
+```
+
+#### Visualiser la base de données
+```bash
+# Ouvrir Prisma Studio (interface graphique)
+npx prisma studio
+```
+
 ## 🧑‍💻 Développement Local
 
 ### Démarrage en mode développement
@@ -46,6 +86,214 @@ npm run dev      # Démarrage en mode développement
 npm run build    # Build de production
 npm run start    # Démarrage en mode production
 npm run lint     # Vérification du code
+```
+
+### 🗄️ Utilisation de Prisma dans le projet
+
+#### Commandes Prisma essentielles
+
+```bash
+# Générer le client Prisma après modification du schéma
+npx prisma generate
+
+# Créer une migration en mode développement
+npx prisma migrate dev --name nom_de_la_migration
+
+# Appliquer les migrations en production
+npx prisma migrate deploy
+
+# Ouvrir Prisma Studio (interface graphique)
+npx prisma studio
+```
+
+#### Structure de la base de données
+Le schéma Prisma (`prisma/schema.prisma`) définit 4 modèles principaux :
+- **Utilisateur** : Table de base pour tous les utilisateurs
+- **Acheteur** : Particuliers (relation 1:1 avec Utilisateur)
+- **Couturier** : Professionnels créateurs (relation 1:1 avec Utilisateur)
+- **Fournisseur** : Entreprises (relation 1:1 avec Utilisateur)
+
+#### Client Prisma singleton
+Le client Prisma est configuré avec l'adaptateur PostgreSQL pour Prisma 7 :
+```typescript
+// src/lib/prisma.ts
+import { PrismaClient } from '@/generated/prisma/client';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+
+export const prisma = new PrismaClient({ adapter });
+```
+
+#### Exemples d'utilisation
+
+**Créer un utilisateur acheteur** :
+```typescript
+const user = await prisma.utilisateur.create({
+  data: {
+    email: 'user@example.com',
+    mot_de_passe: hashedPassword,
+    nom: 'Dupont',
+    prenom: 'Jean',
+    acheteur: {
+      create: {}
+    }
+  },
+  include: {
+    acheteur: true
+  }
+});
+```
+
+**Créer un couturier** :
+```typescript
+const couturier = await prisma.utilisateur.create({
+  data: {
+    email: 'couturier@example.com',
+    mot_de_passe: hashedPassword,
+    nom: 'Martin',
+    prenom: 'Sophie',
+    couturier: {
+      create: {}
+    }
+  },
+  include: {
+    couturier: true
+  }
+});
+```
+
+**Créer un fournisseur** :
+```typescript
+const fournisseur = await prisma.utilisateur.create({
+  data: {
+    email: 'contact@entreprise.com',
+    mot_de_passe: hashedPassword,
+    nom: 'Entreprise SAS',
+    prenom: '',
+    fournisseur: {
+      create: {
+        siret: '12345678901234',
+        nom_societe: 'Entreprise SAS'
+      }
+    }
+  },
+  include: {
+    fournisseur: true
+  }
+});
+```
+
+**Récupérer un utilisateur avec son type** :
+```typescript
+const user = await prisma.utilisateur.findUnique({
+  where: { email: 'user@example.com' },
+  include: {
+    acheteur: true,
+    couturier: true,
+    fournisseur: true
+  }
+});
+
+// Déterminer le type de compte
+if (user.acheteur) console.log('Acheteur');
+if (user.couturier) console.log('Couturier');
+if (user.fournisseur) console.log('Fournisseur');
+```
+
+### 🔐 Système d'authentification
+
+#### Bibliothèques utilisées
+- **jsonwebtoken** : Création et vérification des JWT
+- **crypto (Node.js natif)** : Hashing sécurisé des mots de passe avec scrypt
+- **@prisma/adapter-pg** + **pg** : Adaptateur PostgreSQL pour Prisma 7
+
+#### Fonctionnalités d'authentification
+
+**Utilitaires disponibles** (`src/lib/auth.ts`) :
+```typescript
+import { createToken, verifyToken, setAuthCookie, getCurrentUser } from '@/lib/auth';
+
+// Créer un JWT
+const token = await createToken({
+  userId: user.id,
+  email: user.email,
+  nom: user.nom,
+  prenom: user.prenom,
+  accountType: 'acheteur'
+});
+
+// Définir le cookie d'authentification
+await setAuthCookie(token);
+
+// Récupérer l'utilisateur connecté
+const currentUser = await getCurrentUser();
+
+// Vérifier un token
+const payload = await verifyToken(token);
+```
+
+**Context React pour l'authentification** :
+```typescript
+// Dans un composant client
+import { useAuth } from '@/components/AuthProvider';
+
+function MyComponent() {
+  const { user, loading, error, logout } = useAuth();
+
+  if (loading) return <Loading />;
+  if (error) return <div>Erreur: {error}</div>;
+  if (!user) return <div>Non connecté</div>;
+
+  return (
+    <div>
+      <p>Bienvenue {user.prenom} {user.nom}</p>
+      <button onClick={logout}>Déconnexion</button>
+    </div>
+  );
+}
+```
+
+#### Protection des routes
+Le fichier `src/proxy.ts` protège automatiquement toutes les routes sauf :
+- `/` (page d'accueil)
+- `/login` et `/register`
+- `/forgot-password` et `/reset-password`
+- `/api/login` et `/api/register`
+
+**Désactiver temporairement la protection** :
+```typescript
+// src/proxy.ts
+const AUTH_ENABLED = false; // Mettre à false pour désactiver
+```
+
+#### Endpoints API disponibles
+
+- **POST /api/register** : Création de compte (acheteur/couturier/fournisseur)
+- **POST /api/login** : Connexion et création du JWT
+- **POST /api/logout** : Déconnexion et suppression du cookie
+- **GET /api/me** : Récupération de l'utilisateur connecté
+- **POST /api/refresh** : Rafraîchissement du token JWT
+
+#### Sécurité des mots de passe
+Les mots de passe sont hashés avec **crypto.scrypt** (Node.js natif) :
+```typescript
+import { scrypt, randomBytes } from 'crypto';
+import { promisify } from 'util';
+
+const scryptAsync = promisify(scrypt);
+
+// Hashing
+const salt = randomBytes(16).toString('hex');
+const derivedKey = await scryptAsync(password, salt, 64) as Buffer;
+const hashedPassword = `${salt}:${derivedKey.toString('hex')}`;
+
+// Vérification
+const [salt, hash] = storedPassword.split(':');
+const derivedKey = await scryptAsync(password, salt, 64) as Buffer;
+const isValid = hash === derivedKey.toString('hex');
 ```
 
 ## 🐳 Production avec Docker
@@ -161,12 +409,49 @@ ports:
 
 ## 📚 Technologies Utilisées
 
+### Frontend
 - **Next.js 16** avec App Router
 - **React 19** avec React Compiler
 - **TypeScript** pour le typage statique
 - **TailwindCSS** pour le styling
+
+### Backend & Base de données
+- **Prisma 7.1.0** : ORM avec adaptateur PostgreSQL
+- **PostgreSQL** : Base de données relationnelle
+- **@prisma/adapter-pg** + **pg** : Adaptateur pour Prisma 7
+
+### Authentification
+- **jsonwebtoken** : Gestion des JWT (tokens d'authentification)
+- **crypto (Node.js)** : Hashing des mots de passe avec scrypt
+- **Cookies HTTPOnly** : Stockage sécurisé des tokens
+
+### DevOps
 - **Docker** pour la containerisation
 - **ESLint** pour la qualité du code
+
+## 🔄 Workflow de développement
+
+### 1. Modifier le schéma de base de données
+```bash
+# Éditer prisma/schema.prisma
+# Puis créer la migration
+npx prisma migrate dev --name description_changement
+```
+
+### 2. Régénérer le client Prisma
+```bash
+npx prisma generate
+```
+
+### 3. Tester avec Prisma Studio
+```bash
+npx prisma studio
+```
+
+### 4. Développer les fonctionnalités
+```bash
+npm run dev
+```
 
 ## 🤝 Contribution
 
