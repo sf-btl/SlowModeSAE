@@ -62,11 +62,13 @@ export async function POST(request: Request) {
       prenom: user.prenom,
       accountType
     });
-
+  
     // Définir le cookie
     await setAuthCookie(token);
 
     // Connexion réussie
+    console.log('Utilisateur connecté ID:', user.id, 'Type de compte:', accountType);
+    
     return NextResponse.json({
       success: true,
       message: 'Connexion réussie',
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
         prenom: user.prenom,
         accountType
       }
-    });
+    })
 
   } catch (error) {
     console.error('Erreur lors de la connexion:', error);

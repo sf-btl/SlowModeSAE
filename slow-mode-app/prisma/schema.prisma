@@ -5,8 +5,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Mets "mysql" si tu es sur MySQL
+  provider = "postgresql"
 }
+
 // ==========================================
 // GESTION DES UTILISATEURS (Héritage)
 // ==========================================
@@ -51,6 +52,7 @@ model Couturier {
   commandesGerees   Commande[] 
   patronsCrees      Patron[]   
   postsPublies      Post[]     
+  produits          Produit[]
 }
 
 model Fournisseur {
@@ -98,7 +100,11 @@ model Produit {
   id          Int     @id @default(autoincrement())
   nom_produit String
   description String?
+  imagePath String?
   prix_unitaire Float
+  couturierId Int
+  couturier   Couturier @relation(fields: [couturierId], references: [utilisateurId])
+
   stock       Int
 
   commandes   Commande[] 
@@ -124,10 +130,12 @@ model Post {
   description      String?
   photo_resultat   String?
 
-  couturierId      Int
-  couturier        Couturier @relation(fields: [couturierId], references: [utilisateurId])
+  // Auteur du post
+  couturierId   Int?
+  couturier     Couturier?   @relation(fields: [couturierId], references: [utilisateurId])
 
-  sponsors         Fournisseur[] 
+  fournisseurId Int?
+  fournisseur   Fournisseur? @relation(fields: [fournisseurId], references: [utilisateurId])
 }
 
 model Tissu {
@@ -136,6 +144,8 @@ model Tissu {
   grammage      Int?    
   couleur       String
   metrage_dispo Float
-
-  fournisseurs  Fournisseur[]
+  prix_unitaire Float
+  imagePath     String
+  fournisseurId Int
+  fournisseur   Fournisseur @relation(fields: [fournisseurId], references: [utilisateurId])
 }
