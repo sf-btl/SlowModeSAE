@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import Alert from '@/components/Alert';
 import { EmailIcon, PasswordIcon, ProfilIcon, PhoneIcon, CompanyIcon, SiretIcon, ArrowBackIcon } from '@/components/Icons';
 
 export default function Register() {
@@ -17,6 +18,7 @@ export default function Register() {
   const [passwordError, setPasswordError] = useState('');
   const [countryCode, setCountryCode] = useState('+33');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Liste des départements français (exemples) mettre db plus tard
   const departments = [
@@ -200,11 +202,48 @@ export default function Register() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validatePasswords()) {
-      // Traitement du formulaire si les mots de passe correspondent
-      console.log('Formulaire valide, traitement...');
+    if (!validatePasswords()) return;
+
+    setAlert(null);
+    const formData = new FormData(e.target as HTMLFormElement);
+    
+    const data = {
+      accountType,
+      department,
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      companyName: formData.get('companyName') as string,
+      siret: formData.get('siret') as string,
+      email: formData.get('email') as string,
+      password,
+      phoneNumber,
+      countryCode
+    };
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setAlert({ type: 'success', message: 'Compte créé avec succès ! Redirection...' });
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      } else {
+        setAlert({ type: 'error', message: result.message || 'Erreur lors de la création du compte' });
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      setAlert({ type: 'error', message: 'Erreur lors de la création du compte' });
     }
   };
 
@@ -250,6 +289,19 @@ export default function Register() {
                   <h2 className="text-2xl text-black font-lusitana mb-8">{getFormTitle()}</h2>
               </div>
 
+              {/* Alerte */}
+              {alert && (
+                <Alert 
+                  type={alert.type} 
+                  message={alert.message} 
+                  onClose={() => setAlert(null)}
+                />
+              )}
+
+              {/* Champs cachés pour accountType et department */}
+              <input type="hidden" name="accountType" value={accountType} />
+              <input type="hidden" name="department" value={department} />
+
               {/* Formulaire spécifique selon le type de compte */}
               {accountType === 'entreprise' ? (
                 <>
@@ -257,6 +309,7 @@ export default function Register() {
                   <div className="mb-8">
                     <Input
                       id="companyName"
+                      name="companyName"
                       type="text"
                       required
                       placeholder="Société"
@@ -268,6 +321,7 @@ export default function Register() {
                   <div className="mb-8">
                     <Input
                       id="siret"
+                      name="siret"
                       type="text"
                       required
                       placeholder="N° Siret"
@@ -281,6 +335,7 @@ export default function Register() {
                   <div className="mb-8">
                     <Input
                       id="firstName"
+                      name="firstName"
                       type="text"
                       required
                       placeholder="Prénom"
@@ -292,6 +347,7 @@ export default function Register() {
                   <div className="mb-8">
                     <Input
                       id="lastName"
+                      name="lastName"
                       type="text"
                       required
                       placeholder="Nom"
@@ -305,6 +361,7 @@ export default function Register() {
               <div className="mb-8">
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   required
                   placeholder="e-mail"
