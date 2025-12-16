@@ -39,9 +39,9 @@ export default function TestAuth() {
       <div className="absolute inset-0 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-2xl px-8">
           {alert && (
-            <Alert 
-              type={alert.type} 
-              message={alert.message} 
+            <Alert
+              type={alert.type}
+              message={alert.message}
               onClose={() => setAlert(null)}
             />
           )}
