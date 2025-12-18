@@ -55,7 +55,12 @@ export default function AjouterProduit() {
         return;
       }
 
-      window.location.href = "/";
+      const data = await res.json().catch(() => null);
+      if (data?.produitId) {
+        window.location.href = `/produit/${data.produitId}`;
+      } else {
+        window.location.href = "/";
+      }
     } catch (err) {
       console.error(err);
       alert("Erreur serveur");
