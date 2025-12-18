@@ -236,7 +236,7 @@ export default function Register() {
       if (result.success) {
         setAlert({ type: 'success', message: 'Compte créé avec succès ! Redirection...' });
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/profil';
         }, 1500);
       } else {
         setAlert({ type: 'error', message: result.message || 'Erreur lors de la création du compte' });

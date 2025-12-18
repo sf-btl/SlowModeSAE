@@ -32,7 +32,7 @@ export default function Login() {
       if (result.success) {
         setAlert({ type: 'success', message: 'Connexion réussie ! Redirection...' });
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/profil';
         }, 1500);
       } else {
         setAlert({ type: 'error', message: result.message || 'Erreur lors de la connexion' });
