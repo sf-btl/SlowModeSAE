@@ -144,7 +144,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                 Par{" "}
                 <span className="font-semibold text-[color:var(--color-creator,#4b2d52)]">{product.couturierName}</span>
               </p>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-900">
                 Taille: <span className="font-semibold text-gray-900">{selectedSize}</span>
               </p>
             </section>
@@ -159,11 +159,10 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                         key={size}
                         type="button"
                         onClick={() => setSelectedSize(size)}
-                        className={`flex h-10 items-center justify-center rounded-md border text-sm font-semibold transition ${
-                          isActive
-                            ? "border-[color:var(--color-creator,#4b2d52)] bg-[color:var(--color-creator,#4b2d52)] text-white"
-                            : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
-                        }`}
+                        className={`flex h-10 items-center justify-center rounded-md border text-sm font-semibold transition ${isActive
+                          ? "border-[color:var(--color-creator,#4b2d52)] bg-[color:var(--color-creator,#4b2d52)] text-white"
+                          : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
+                          }`}
                         aria-pressed={isActive}
                       >
                         {size}
@@ -201,7 +200,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                   <Star className="h-4 w-4 text-amber-500" />
                   Description
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-gray-700 sm:text-base">
+                <p className="mt-2 text-sm leading-relaxed text-black sm:text-base">
                   {expanded ? product.description || "Aucune description fournie." : shortDescription}
                 </p>
                 {showToggle && (
@@ -224,12 +223,11 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
               ].map((item, index) => (
                 <div
                   key={item.label}
-                  className={`flex items-center justify-between px-4 py-3 text-sm text-gray-800 sm:text-base ${
-                    index < 2 ? "border-b border-gray-200" : ""
-                  }`}
+                  className={`flex items-center justify-between px-4 py-3 text-sm text-gray-900 sm:text-base ${index < 2 ? "border-b border-gray-200" : ""
+                    }`}
                 >
                   <span className="font-semibold text-gray-900">{item.label}</span>
-                  <span className="text-gray-700">{item.value}</span>
+                  <span className="text-gray-900">{item.value}</span>
                 </div>
               ))}
             </section>

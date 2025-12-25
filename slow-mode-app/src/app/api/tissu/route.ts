@@ -118,6 +118,7 @@ export async function POST(req: Request) {
                     // On lie au fournisseur connecté
                     fournisseurId: fournisseurId,
                     // couturierId reste null ou undefined
+                    tissuId: tissu.id, // Linking the post to the fabric
                 },
             });
         }

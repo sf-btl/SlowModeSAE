@@ -152,7 +152,7 @@ export default function AjouterTissu() {
                         {/* Checkbox créer un post */}
                         <label
                             htmlFor="createPost"
-                            className="flex items-center gap-3 text-sm font-montserrat text-zinc-800"
+                            className="flex items-center gap-3 text-sm font-montserrat text-black"
                         >
                             <input
                                 id="createPost"
@@ -167,7 +167,7 @@ export default function AjouterTissu() {
                         {/* CHAMPS DE POST (Affichage Conditionnel) */}
                         {createPost && (
                             <div className="space-y-4 pt-4 border-t border-gray-200">
-                                <h2 className="text-lg font-serif text-zinc-700">Détails de la publication</h2>
+                                <h2 className="text-lg font-serif text-black">Détails de la publication</h2>
 
                                 <Input
                                     id="titrePost"

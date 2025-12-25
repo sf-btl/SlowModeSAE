@@ -23,6 +23,8 @@ import {
 type Post = {
   id: number;
   photo_resultat: string | null;
+  produitId?: number | null;
+  tissuId?: number | null;
 };
 
 /* =======================
@@ -48,7 +50,7 @@ function MenuButton({
       <span className="flex-1 text-sm font-montserrat text-gray-900">
         {label}
       </span>
-      <ChevronRight className="h-4 w-4 text-gray-400" />
+      <ChevronRight className="h-4 w-4 text-black" />
     </div>
   );
 
@@ -218,12 +220,12 @@ export default function ProfilPage() {
                 {accountLabel}
               </span>
 
-              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-gray-700">
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-gray-900">
                 <MapPin className="h-4 w-4" />
                 <span>Localité non renseignée</span>
               </div>
 
-              <p className="mt-1 text-sm text-gray-600">{user.email}</p>
+              <p className="mt-1 text-sm text-gray-900">{user.email}</p>
             </div>
           </section>
 
@@ -257,25 +259,33 @@ export default function ProfilPage() {
                   ))}
                 </div>
               ) : posts.length === 0 ? (
-                <p className="text-center text-sm text-gray-500">
+                <p className="text-center text-sm text-black">
                   Aucune publication pour le moment.
                 </p>
               ) : (
                 <div className="grid grid-cols-3 gap-2">
-                  {posts.map((post) => (
-                    <div
-                      key={post.id}
-                      className="aspect-square overflow-hidden rounded-lg bg-gray-100"
-                    >
-                      {post.photo_resultat && (
-                        <img
-                          src={post.photo_resultat}
-                          alt="Publication"
-                          className="h-full w-full object-cover"
-                        />
-                      )}
-                    </div>
-                  ))}
+                  {posts.map((post) => {
+                    // Déterminer le lien cible
+                    let href = "#";
+                    if (post.produitId) href = `/produit/${post.produitId}`;
+                    else if (post.tissuId) href = `/tissu/${post.tissuId}`;
+
+                    return (
+                      <Link
+                        key={post.id}
+                        href={href}
+                        className="aspect-square overflow-hidden rounded-lg bg-gray-100 block transition hover:opacity-90"
+                      >
+                        {post.photo_resultat && (
+                          <img
+                            src={post.photo_resultat}
+                            alt="Publication"
+                            className="h-full w-full object-cover"
+                          />
+                        )}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </section>

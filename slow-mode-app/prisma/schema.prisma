@@ -13,14 +13,14 @@ datasource db {
 // ==========================================
 
 model Utilisateur {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  mot_de_passe   String
-  nom            String
-  prenom         String
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  mot_de_passe    String
+  nom             String
+  prenom          String
   adresse_postale String?
-  ville          String?
-  createdAt      DateTime @default(now())
+  ville           String?
+  createdAt       DateTime @default(now())
 
   // Relations 1:1
   acheteur    Acheteur?
@@ -30,44 +30,44 @@ model Utilisateur {
 
 model Acheteur {
   // ICI : L'ID est à la fois PK et FK. Pas d'auto-incrément.
-  utilisateurId Int         @id 
+  utilisateurId Int         @id
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
 
-  mensurations  String? 
+  mensurations String?
 
   // Relations
-  commandes     Commande[] 
+  commandes Commande[]
 }
 
 model Couturier {
   // ICI : Idem
-  utilisateurId    Int         @id
-  utilisateur      Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateurId Int         @id
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
 
   bio_description   String?
   annees_experience Int?
   note_moyenne      Float?  @default(0)
 
   // Relations
-  commandesGerees   Commande[] 
-  patronsCrees      Patron[]   
-  postsPublies      Post[]     
-  produits          Produit[]
+  commandesGerees Commande[]
+  patronsCrees    Patron[]
+  postsPublies    Post[]
+  produits        Produit[]
 }
 
 model Fournisseur {
   // ICI : Idem
-  utilisateurId      Int         @id
-  utilisateur        Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateurId Int         @id
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
 
-  siret              String  @unique
-  nom_societe        String
-  note_moyenne       Float?  @default(0)
+  siret        String @unique
+  nom_societe  String
+  note_moyenne Float? @default(0)
 
   // Relations
-  commandesExpediees Commande[] 
-  postsSponsorises   Post[]     
-  tissusVendus       Tissu[]    
+  commandesExpediees Commande[]
+  postsSponsorises   Post[]
+  tissusVendus       Tissu[]
 }
 
 // ==========================================
@@ -83,31 +83,32 @@ model Commande {
 
   // Relations : Note que le champ de liaison change de nom pour être plus clair
   // Il pointe maintenant vers "utilisateurId" de la table Acheteur/Couturier
-  
-  acheteurId    Int
-  acheteur      Acheteur @relation(fields: [acheteurId], references: [utilisateurId])
 
-  couturierId   Int
-  couturier     Couturier? @relation(fields: [couturierId], references: [utilisateurId])
+  acheteurId Int
+  acheteur   Acheteur @relation(fields: [acheteurId], references: [utilisateurId])
+
+  couturierId Int
+  couturier   Couturier? @relation(fields: [couturierId], references: [utilisateurId])
 
   fournisseurId Int?
   fournisseur   Fournisseur? @relation(fields: [fournisseurId], references: [utilisateurId])
-  
-  produits      Produit[]
+
+  produits Produit[]
 }
 
 model Produit {
-  id          Int     @id @default(autoincrement())
-  nom_produit String
-  description String?
-  imagePath String?
+  id            Int       @id @default(autoincrement())
+  nom_produit   String
+  description   String?
+  imagePath     String?
   prix_unitaire Float
-  couturierId Int
-  couturier   Couturier @relation(fields: [couturierId], references: [utilisateurId])
+  couturierId   Int
+  couturier     Couturier @relation(fields: [couturierId], references: [utilisateurId])
 
-  stock       Int
+  stock Int
 
-  commandes   Commande[] 
+  commandes Commande[]
+  posts     Post[]
 }
 
 // ==========================================
@@ -115,9 +116,9 @@ model Produit {
 // ==========================================
 
 model Patron {
-  id          Int     @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   nom_patron  String
-  fichier_pdf String 
+  fichier_pdf String
 
   couturierId Int
   couturier   Couturier @relation(fields: [couturierId], references: [utilisateurId])
@@ -131,21 +132,28 @@ model Post {
   photo_resultat   String?
 
   // Auteur du post
-  couturierId   Int?
-  couturier     Couturier?   @relation(fields: [couturierId], references: [utilisateurId])
+  couturierId Int?
+  couturier   Couturier? @relation(fields: [couturierId], references: [utilisateurId])
 
   fournisseurId Int?
   fournisseur   Fournisseur? @relation(fields: [fournisseurId], references: [utilisateurId])
+
+  produitId Int?
+  produit   Produit? @relation(fields: [produitId], references: [id])
+
+  tissuId Int?
+  tissu   Tissu? @relation(fields: [tissuId], references: [id])
 }
 
 model Tissu {
-  id            Int     @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   matiere       String
-  grammage      Int?    
+  grammage      Int?
   couleur       String
   metrage_dispo Float
   prix_unitaire Float
   imagePath     String
   fournisseurId Int
   fournisseur   Fournisseur @relation(fields: [fournisseurId], references: [utilisateurId])
+  posts         Post[]
 }

@@ -3,15 +3,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import fs from "fs/promises";
-import path from "path"; 
+import path from "path";
 // Importez vos utilitaires de session
-import { getCurrentUser } from "@/lib/auth"; 
+import { getCurrentUser } from "@/lib/auth";
 
 // Chemin de stockage public (où les images seront accessibles via /uploads/...)
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
 export async function POST(req: Request) {
-    
+
     // ------------------------------------------
     // 1. VÉRIFICATION DE LA SESSION ET DES DROITS
     // ------------------------------------------
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
             { status: 401 }
         );
     }
-    
+
     const { userId, accountType } = userSession;
 
     // Connexion réussie
@@ -33,20 +33,20 @@ export async function POST(req: Request) {
     // RÈGLE D'AUTORISATION : Seuls les 'couturier' (ou 'admin' si vous en avez) peuvent créer un produit.
     // L'ID du créateur est l'ID de l'utilisateur.
     if (accountType !== 'couturier') {
-         // Si vous voulez autoriser les 'admin' : || accountType !== 'admin'
-         return NextResponse.json(
+        // Si vous voulez autoriser les 'admin' : || accountType !== 'admin'
+        return NextResponse.json(
             { success: false, message: "Accès refusé. Seuls les comptes Couturier peuvent ajouter des produits." },
             { status: 403 } // 403 Forbidden
         );
     }
 
     // Nous avons l'ID du couturier connecté
-    const couturierId = userId; 
-    
+    const couturierId = userId;
+
     // ------------------------------------------
     // 2. RÉCUPÉRATION DES DONNÉES ET GESTION D'IMAGE
     // ------------------------------------------
-    
+
     const formData = await req.formData();
 
     const nom = formData.get("nom") as string;
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     const imageFile = formData.get("image") as File | null;
 
 
-    let imagePath: string | null = null; 
+    let imagePath: string | null = null;
 
     // Gestion et enregistrement du fichier image (s'il existe)
     if (imageFile && imageFile.size > 0) {
@@ -71,17 +71,17 @@ export async function POST(req: Request) {
             const bytes = await imageFile.arrayBuffer();
             const buffer = Buffer.from(bytes);
             await fs.writeFile(fullPath, buffer);
-            imagePath = `/uploads/${fileName}`; 
+            imagePath = `/uploads/${fileName}`;
         } catch (error) {
             console.error("Erreur lors de l'enregistrement de l'image:", error);
-            imagePath = null; 
+            imagePath = null;
         }
     }
 
     // ------------------------------------------
     // 3. CRÉATION EN BASE DE DONNÉES
     // ------------------------------------------
-    
+
     try {
         const produit = await prisma.produit.create({
             data: {
@@ -100,8 +100,9 @@ export async function POST(req: Request) {
                 data: {
                     titre_creation: titrePost,
                     description: descriptionPost,
-                    couturierId, // <--- ID OBTENU DE LA SESSION
+                    couturierId,
                     photo_resultat: imagePath,
+                    produitId: produit.id, // Linking the post to the product
                 },
             });
         }

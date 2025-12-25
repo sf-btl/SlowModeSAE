@@ -22,6 +22,8 @@ export async function GET() {
         select: {
             id: true,
             photo_resultat: true,
+            produitId: true,
+            tissuId: true,
         },
     });
 
