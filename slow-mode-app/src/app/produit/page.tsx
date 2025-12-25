@@ -4,8 +4,6 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
-// NOTE: J'ai retiré 'Header' de l'import car il n'est pas utilisé dans le JSX fourni
-// NOTE: J'ai retiré l'import de Header car il n'est pas utilisé dans le JSX fourni.
 
 
 export default function AjouterProduit() {
@@ -17,9 +15,9 @@ export default function AjouterProduit() {
   const [image, setImage] = useState<File | null>(null);
 
   // État pour le POST (Publication)
-  const [createPost, setCreatePost] = useState(false); // Checkbox: Si un post doit être créé
-  const [titrePost, setTitrePost] = useState("");      // Nouveau: Titre pour le post
-  const [descriptionPost, setDescriptionPost] = useState(""); // Nouveau: Description pour le post
+  const [createPost, setCreatePost] = useState(false);
+  const [titrePost, setTitrePost] = useState("");
+  const [descriptionPost, setDescriptionPost] = useState("");
 
   // États pour le contrôle de l'UI
   const [loading, setLoading] = useState(false);
@@ -41,7 +39,6 @@ export default function AjouterProduit() {
     if (createPost) {
       formData.append("titrePost", titrePost);
       formData.append("descriptionPost", descriptionPost);
-      // NOTE: L'image du produit sera probablement utilisée pour le post également
     }
 
     try {
