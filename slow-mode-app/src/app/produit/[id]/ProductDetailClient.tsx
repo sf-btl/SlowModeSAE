@@ -86,7 +86,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
   const showToggle = product.description && product.description.length > 160;
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col bg-white text-gray-900">
+    <div className="flex min-h-screen w-full flex-col bg-white text-gray-900">
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 bg-white/90 px-5 py-4 backdrop-blur md:px-8">
         <button
           type="button"
@@ -114,7 +114,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
         </div>
       </header>
 
-      <main className="flex-1 px-5 pb-32 pt-2 md:px-8 lg:pb-36">
+      <main className="mx-auto flex-1 w-full max-w-6xl px-5 pb-32 pt-2 md:px-8 lg:pb-36">
         <div className="grid gap-8 md:grid-cols-[1.05fr,1fr] lg:grid-cols-[1.1fr,1fr] lg:gap-12">
           <div className="flex justify-center">
             <div className="relative h-72 w-full max-w-[380px] overflow-hidden rounded-3xl bg-gray-50 shadow-sm sm:h-80 md:max-w-full lg:h-[440px]">

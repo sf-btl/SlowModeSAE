@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Lusitana, Montserrat, Istok_Web } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Lusitana,
+  Montserrat,
+  Istok_Web,
+  Inter,
+} from "next/font/google";
 import "./globals.css";
 import ClientLayout from "@/components/ClientLayout";
 
@@ -31,6 +38,10 @@ const istokWeb = Istok_Web({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
 
 
 
@@ -49,7 +60,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${lusitana.variable} ${montserrat.variable} ${istokWeb.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${lusitana.variable} ${montserrat.variable} ${istokWeb.variable} ${inter.variable} antialiased`}
       >
         <ClientLayout>{children}</ClientLayout>
       </body>
