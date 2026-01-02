@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import {
   Geist,
   Geist_Mono,
@@ -8,7 +9,8 @@ import {
   Inter,
 } from "next/font/google";
 import "./globals.css";
-import ClientLayout from "@/components/ClientLayout";
+import { CartProvider } from '@/components/CartProvider';
+import ClientLayout from '@/components/ClientLayout';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,7 +53,6 @@ export const metadata: Metadata = {
 };
 
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -62,7 +63,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${lusitana.variable} ${montserrat.variable} ${istokWeb.variable} ${inter.variable} antialiased`}
       >
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout>
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </ClientLayout>
       </body>
     </html>
   );

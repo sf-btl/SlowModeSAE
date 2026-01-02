@@ -1,8 +1,25 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Heart, ShoppingCart, Search, Home, User, MessageCircle, Share2, Bookmark, MoreVertical } from 'lucide-react';
+import { Heart, ShoppingCart, Search, Home, User, Package } from 'lucide-react';
 
 // Types basés sur votre schéma Prisma
+interface Tissu {
+  id: number;
+  matiere: string;
+  grammage: number | null;
+  couleur: string;
+  metrage_dispo: number;
+  prix_unitaire: number;
+  imagePath: string;
+  fournisseur: {
+    nom_societe: string;
+    utilisateur: {
+      nom: string;
+      prenom: string;
+    };
+  };
+}
+
 interface Product {
   id: number;
   nom_produit: string;
@@ -29,8 +46,10 @@ const detectCategory = (nomProduit: string): string => {
   return 'Produit';
 };
 
-export default function ProductFeedPage() {
+export default function FeedPage() {
+  const [activeTab, setActiveTab] = useState<'patrons' | 'tissus'>('patrons');
   const [products, setProducts] = useState<Product[]>([]);
+  const [tissus, setTissus] = useState<Tissu[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tout');
@@ -39,8 +58,12 @@ export default function ProductFeedPage() {
   const categories = ['Tout', 'Pantalon', 'Chemise', 'Robe', 'Veste'];
 
   useEffect(() => {
-    fetchProducts();
-  }, [selectedCategory]);
+    if (activeTab === 'patrons') {
+      fetchProducts();
+    } else {
+      fetchTissus();
+    }
+  }, [selectedCategory, activeTab]);
 
   const fetchProducts = async () => {
     try {
@@ -49,7 +72,6 @@ export default function ProductFeedPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Filtrage côté client basé sur le nom du produit
         let filteredProducts = data.products;
         
         if (selectedCategory !== 'Tout') {
@@ -66,6 +88,25 @@ export default function ProductFeedPage() {
     } catch (err) {
       console.error('Erreur:', err);
       setError('Impossible de charger les produits');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTissus = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/tissus/feed');
+      const data = await response.json();
+
+      if (data.success) {
+        setTissus(data.tissus);
+      } else {
+        setError(data.message || 'Erreur lors du chargement des tissus');
+      }
+    } catch (err) {
+      console.error('Erreur:', err);
+      setError('Impossible de charger les tissus');
     } finally {
       setLoading(false);
     }
@@ -92,7 +133,7 @@ export default function ProductFeedPage() {
         <div className="text-center">
           <p className="text-red-600 font-montserrat mb-4">{error}</p>
           <button
-            onClick={fetchProducts}
+            onClick={() => activeTab === 'patrons' ? fetchProducts() : fetchTissus()}
             className="bg-cyan-950 text-white px-6 py-2 rounded-xl font-montserrat"
           >
             Réessayer
@@ -119,144 +160,247 @@ export default function ProductFeedPage() {
         </div>
       </header>
 
-      {/* Filtre de catégories */}
+      {/* Tabs Patrons / Tissus */}
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="relative">
+        <div className="flex gap-2 bg-white">
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full max-w-xs bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-left flex items-center justify-between hover:border-gray-400 transition-colors"
+            onClick={() => setActiveTab('patrons')}
+            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
+              activeTab === 'patrons'
+                ? 'bg-gray-100 text-gray-900'
+                : 'bg-transparent text-gray-700 hover:bg-gray-50'
+            }`}
           >
-            <span className="text-gray-900 font-montserrat">{selectedCategory}</span>
-            <svg 
-              className={`w-5 h-5 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <Package size={18} />
+            Patrons
           </button>
-
-          {isDropdownOpen && (
-            <>
-              {/* Overlay pour fermer le dropdown */}
-              <div 
-                className="fixed inset-0 z-10" 
-                onClick={() => setIsDropdownOpen(false)}
-              />
-              
-              {/* Menu dropdown */}
-              <div className="absolute top-full left-0 mt-1 w-full max-w-xs bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 font-montserrat transition-colors ${
-                      selectedCategory === category
-                        ? 'bg-gray-100 text-gray-900 font-semibold'
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+          <button
+            onClick={() => setActiveTab('tissus')}
+            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
+              activeTab === 'tissus'
+                ? 'bg-gray-100 text-gray-900'
+                : 'bg-transparent text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+            </svg>
+            Tissus
+          </button>
         </div>
       </div>
 
-      {/* Feed de produits */}
-      <div className="max-w-4xl mx-auto">
-        {products.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 font-montserrat">Aucun produit disponible</p>
-          </div>
-        ) : (
-          products.map((product) => (
-            <article key={product.id} className="bg-white mb-6">
-              {/* Card container avec bordure et ombre */}
-              <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 mx-4">
-                {/* Image du produit - Cliquable */}
+      {/* Filtre de catégories - Seulement pour Patrons */}
+      {activeTab === 'patrons' && (
+        <div className="max-w-4xl mx-auto px-4 pb-4">
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full max-w-xs bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-left flex items-center justify-between hover:border-gray-400 transition-colors"
+            >
+              <span className="text-gray-900 font-montserrat">{selectedCategory}</span>
+              <svg 
+                className={`w-5 h-5 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {isDropdownOpen && (
+              <>
                 <div 
-                  className="relative w-full aspect-[4/5] bg-gray-50 cursor-pointer overflow-hidden"
-                  onClick={() => window.location.href = `/produit/${product.id}`}
-                >
-                  {/* Icône coeur en haut à droite */}
-                  <button 
-                    className="absolute top-3 right-3 z-10 bg-white rounded-full p-2 shadow-md hover:scale-110 transition-transform"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Logique pour ajouter aux favoris
-                    }}
-                  >
-                    <Heart size={20} className="text-gray-700" />
-                  </button>
+                  className="fixed inset-0 z-10" 
+                  onClick={() => setIsDropdownOpen(false)}
+                />
+                
+                <div className="absolute top-full left-0 mt-1 w-full max-w-xs bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 font-montserrat transition-colors ${
+                        selectedCategory === category
+                          ? 'bg-gray-100 text-gray-900 font-semibold'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
-                  {product.imagePath ? (
-                    <img
-                      src={product.imagePath}
-                      alt={product.nom_produit}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <span className="font-montserrat">Pas d'image</span>
-                    </div>
-                  )}
-                {product.stock < 5 && product.stock > 0 && (
-                  <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Plus que {product.stock} !
-                  </div>
-                )}
-                {product.stock === 0 && (
-                  <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Rupture de stock
-                  </div>
-                )}
-              </div>
-
-              {/* Informations produit */}
-              <div className="p-4">
-                {/* Catégorie */}
-                <p className="text-xs text-gray-500 font-montserrat mb-1">
-                  {detectCategory(product.nom_produit)}
-                </p>
-
-                {/* Titre et Prix */}
-                <div className="flex items-start justify-between mb-3">
-                  <h2 
-                    className="text-xl font-bold text-gray-900 font-lusitana cursor-pointer hover:text-cyan-950 transition-colors flex-1"
+      {/* Feed Patrons */}
+      {activeTab === 'patrons' && (
+        <div className="max-w-4xl mx-auto">
+          {products.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 font-montserrat">Aucun produit disponible</p>
+            </div>
+          ) : (
+            products.map((product) => (
+              <article key={product.id} className="bg-white mb-6">
+                <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 mx-4">
+                  <div 
+                    className="relative w-full aspect-[4/5] bg-gray-50 cursor-pointer overflow-hidden"
                     onClick={() => window.location.href = `/produit/${product.id}`}
                   >
-                    {product.nom_produit}
-                  </h2>
-                  <div className="text-xl font-bold text-gray-900 font-lusitana ml-3">
-                    {product.prix_unitaire.toFixed(2)} €
+                    <button 
+                      className="absolute top-3 right-3 z-10 bg-white rounded-full p-2 shadow-md hover:scale-110 transition-transform"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <Heart size={20} className="text-gray-700" />
+                    </button>
+
+                    {product.imagePath ? (
+                      <img
+                        src={product.imagePath}
+                        alt={product.nom_produit}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <span className="font-montserrat">Pas d'image</span>
+                      </div>
+                    )}
+
+                    {product.stock < 5 && product.stock > 0 && (
+                      <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        Plus que {product.stock} !
+                      </div>
+                    )}
+                    {product.stock === 0 && (
+                      <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        Rupture de stock
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4">
+                    <p className="text-xs text-gray-500 font-montserrat mb-1">
+                      {detectCategory(product.nom_produit)}
+                    </p>
+
+                    <div className="flex items-start justify-between mb-3">
+                      <h2 
+                        className="text-xl font-bold text-gray-900 font-lusitana cursor-pointer hover:text-cyan-950 transition-colors flex-1"
+                        onClick={() => window.location.href = `/produit/${product.id}`}
+                      >
+                        {product.nom_produit}
+                      </h2>
+                      <div className="text-xl font-bold text-gray-900 font-lusitana ml-3">
+                        {product.prix_unitaire.toFixed(2)} €
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => window.location.href = `/produit/${product.id}`}
+                      className={`w-full py-3 rounded-xl font-semibold text-sm transition-all font-montserrat ${
+                        product.stock > 0
+                          ? 'bg-black text-white hover:bg-gray-800'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                      disabled={product.stock === 0}
+                    >
+                      {product.stock > 0 ? 'Sélectionner' : 'Indisponible'}
+                    </button>
                   </div>
                 </div>
+              </article>
+            ))
+          )}
+        </div>
+      )}
 
-                {/* Bouton Sélectionner */}
-                <button
-                  onClick={() => window.location.href = `/produit/${product.id}`}
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-all font-montserrat ${
-                    product.stock > 0
-                      ? 'bg-black text-white hover:bg-gray-800'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                  disabled={product.stock === 0}
-                >
-                  {product.stock > 0 ? 'Sélectionner' : 'Indisponible'}
-                </button>
-              </div>
+      {/* Feed Tissus */}
+      {activeTab === 'tissus' && (
+        <div className="max-w-4xl mx-auto">
+          {tissus.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 font-montserrat">Aucun tissu disponible</p>
             </div>
-          </article>
-          ))
-        )}
-      </div>
+          ) : (
+            tissus.map((tissu) => (
+              <article key={tissu.id} className="bg-white mb-6">
+                <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 mx-4">
+                  <div 
+                    className="relative w-full aspect-[4/5] bg-gray-50 cursor-pointer overflow-hidden"
+                    onClick={() => window.location.href = `/tissu/${tissu.id}`}
+                  >
+                    <img
+                      src={tissu.imagePath}
+                      alt={tissu.matiere}
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                    />
+
+                    {tissu.metrage_dispo < 10 && tissu.metrage_dispo > 0 && (
+                      <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        Plus que {tissu.metrage_dispo}m !
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-5">
+                    {/* Matière et Prix */}
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm text-gray-600 font-montserrat">
+                        {tissu.matiere}
+                      </p>
+                      <div className="text-2xl font-bold text-orange-500 font-lusitana">
+                        {tissu.prix_unitaire.toFixed(0)}€/m
+                      </div>
+                    </div>
+
+                    {/* Titre */}
+                    <h2 
+                      className="text-xl font-bold text-gray-900 font-lusitana mb-1 cursor-pointer hover:text-cyan-950 transition-colors"
+                      onClick={() => window.location.href = `/tissu/${tissu.id}`}
+                    >
+                      {tissu.matiere} {tissu.couleur}
+                    </h2>
+
+                    {/* Fournisseur */}
+                    <p className="text-sm text-gray-600 font-montserrat mb-4">
+                      par {tissu.fournisseur.nom_societe}
+                    </p>
+
+                    {/* Pastilles de couleur */}
+                    <div className="flex gap-2 mb-4">
+                      <div 
+                        className="w-8 h-8 rounded-full border-2 border-gray-300"
+                        style={{ backgroundColor: tissu.couleur.toLowerCase() }}
+                        title={tissu.couleur}
+                      />
+                      {/* Vous pouvez ajouter d'autres variations de couleur ici */}
+                    </div>
+
+                    {/* Bouton */}
+                    <button
+                      onClick={() => window.location.href = `/tissu/${tissu.id}`}
+                      className="w-full py-3 rounded-xl font-semibold text-sm transition-all font-montserrat bg-black text-white hover:bg-gray-800"
+                    >
+                      Sélectionner
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-creatorcolor border-t border-gray-700 shadow-lg z-50">

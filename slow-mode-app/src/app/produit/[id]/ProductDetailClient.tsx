@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Search, ShoppingCart, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useCart } from '@/components/CartProvider';
 
 export type ProductDetailViewModel = {
   id: number;
@@ -69,8 +70,10 @@ function formatRelativeTime(isoDate?: string | null): string {
 
 export default function ProductDetailClient({ product }: { product: ProductDetailViewModel }) {
   const router = useRouter();
+  const { addToCart, getTotalItems } = useCart();
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [expanded, setExpanded] = useState(false);
+  const [showAddedMessage, setShowAddedMessage] = useState(false);
 
   const priceLabel = useMemo(() => formatPriceEUR(product.price), [product.price]);
   const categoryLabel = useMemo(() => deriveCategory(product.name), [product.name]);
@@ -85,8 +88,33 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
 
   const showToggle = product.description && product.description.length > 160;
 
+  const handleAddToCart = () => {
+    if (product.stock <= 0) return;
+
+    addToCart({
+      id: product.id,
+      type: 'produit',
+      nom: product.name,
+      prix: product.price,
+      image: product.imagePath,
+      stock: product.stock,
+    });
+
+    setShowAddedMessage(true);
+    setTimeout(() => setShowAddedMessage(false), 3000);
+  };
+
+  const cartItemCount = getTotalItems();
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-white text-gray-900">
+      {/* Message de confirmation */}
+      {showAddedMessage && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg font-montserrat animate-bounce">
+          ✓ Produit ajouté au panier
+        </div>
+      )}
+
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 bg-white/90 px-5 py-4 backdrop-blur md:px-8">
         <button
           type="button"
@@ -106,10 +134,16 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
           </button>
           <button
             type="button"
-            className="rounded-full p-2 text-gray-800 transition hover:bg-gray-100"
+            onClick={() => router.push('/panier')}
+            className="relative rounded-full p-2 text-gray-800 transition hover:bg-gray-100"
             aria-label="Panier"
           >
             <ShoppingCart className="h-5 w-5" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {cartItemCount}
+              </span>
+            )}
           </button>
         </div>
       </header>
@@ -238,10 +272,16 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
       <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-5 pb-6 pt-3 shadow-[0_-6px_30px_rgba(0,0,0,0.06)] backdrop-blur md:px-8">
         <button
           type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--color-creator,#4b2d52)] px-6 py-3 text-base font-semibold text-white transition hover:opacity-95"
+          onClick={handleAddToCart}
+          disabled={product.stock <= 0}
+          className={`flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold text-white transition ${
+            product.stock > 0
+              ? 'bg-[color:var(--color-creator,#4b2d52)] hover:opacity-95'
+              : 'bg-gray-400 cursor-not-allowed'
+          }`}
         >
           <ShoppingCart className="h-5 w-5" />
-          Ajouter au panier
+          {product.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
         </button>
       </div>
     </div>

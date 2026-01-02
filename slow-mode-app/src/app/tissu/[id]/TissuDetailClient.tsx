@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Search, ShoppingCart, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useCart } from '@/components/CartProvider';
 
 export type TissuDetailViewModel = {
     id: number;
@@ -26,13 +27,54 @@ function formatPriceEUR(value: number): string {
 
 export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewModel }) {
     const router = useRouter();
+    const { addToCart, getTotalItems } = useCart();
+    const [metrage, setMetrage] = useState(1);
+    const [showAddedMessage, setShowAddedMessage] = useState(false);
 
-    // Formatage des données
     const priceLabel = useMemo(() => formatPriceEUR(tissu.price), [tissu.price]);
     const nameLabel = `${tissu.matiere} ${tissu.couleur}`;
 
+    const handleAddToCart = () => {
+        if (tissu.metrage_dispo <= 0) return;
+
+        addToCart({
+            id: tissu.id,
+            type: 'tissu',
+            nom: nameLabel,
+            prix: tissu.price,
+            image: tissu.imagePath,
+            metrage: metrage,
+            unite: 'm',
+        });
+
+        setShowAddedMessage(true);
+        setTimeout(() => setShowAddedMessage(false), 3000);
+    };
+
+    const incrementMetrage = () => {
+        if (metrage < tissu.metrage_dispo) {
+            setMetrage(metrage + 1);
+        }
+    };
+
+    const decrementMetrage = () => {
+        if (metrage > 1) {
+            setMetrage(metrage - 1);
+        }
+    };
+
+    const cartItemCount = getTotalItems();
+    const totalPrice = tissu.price * metrage;
+
     return (
         <div className="flex min-h-screen flex-col bg-white pb-24">
+            {/* Message de confirmation */}
+            {showAddedMessage && (
+                <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg font-montserrat animate-bounce">
+                    ✓ Tissu ajouté au panier
+                </div>
+            )}
+
             <header className="px-4 pt-10 pb-4 flex items-center justify-between">
                 <button
                     type="button"
@@ -53,10 +95,16 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
                     </button>
                     <button
                         type="button"
-                        className="rounded-full p-2 text-gray-800 transition hover:bg-gray-100"
+                        onClick={() => router.push('/panier')}
+                        className="relative rounded-full p-2 text-gray-800 transition hover:bg-gray-100"
                         aria-label="Panier"
                     >
                         <ShoppingCart className="h-5 w-5" />
+                        {cartItemCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                {cartItemCount}
+                            </span>
+                        )}
                     </button>
                 </div>
             </header>
@@ -134,6 +182,42 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
                                 </div>
                             </div>
                         </div>
+
+                        {/* Sélecteur de métrage */}
+                        {tissu.metrage_dispo > 0 && (
+                            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-sm font-semibold text-gray-900">
+                                        Métrage souhaité
+                                    </span>
+                                    <div className="flex items-center gap-3 bg-gray-100 rounded-lg px-3 py-2">
+                                        <button
+                                            onClick={decrementMetrage}
+                                            className="text-gray-700 hover:text-gray-900 font-bold text-xl"
+                                            disabled={metrage <= 1}
+                                        >
+                                            -
+                                        </button>
+                                        <span className="font-semibold text-gray-900 min-w-[3ch] text-center">
+                                            {metrage}m
+                                        </span>
+                                        <button
+                                            onClick={incrementMetrage}
+                                            className="text-gray-700 hover:text-gray-900 font-bold text-xl"
+                                            disabled={metrage >= tissu.metrage_dispo}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                                    <span className="text-sm text-gray-600">Total</span>
+                                    <span className="text-xl font-bold text-gray-900 font-lusitana">
+                                        {formatPriceEUR(totalPrice)}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </section>
                 </div>
             </main>
@@ -142,10 +226,16 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
                 <div className="mx-auto w-full max-w-2xl px-4">
                     <button
                         type="button"
-                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--color-creator,#4b2d52)] px-6 py-3 text-base font-semibold text-white transition hover:opacity-95"
+                        onClick={handleAddToCart}
+                        disabled={tissu.metrage_dispo <= 0}
+                        className={`flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold text-white transition ${
+                            tissu.metrage_dispo > 0
+                                ? 'bg-[color:var(--color-creator,#4b2d52)] hover:opacity-95'
+                                : 'bg-gray-400 cursor-not-allowed'
+                        }`}
                     >
                         <ShoppingCart className="h-5 w-5" />
-                        Commander ce tissu
+                        {tissu.metrage_dispo > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
                     </button>
                 </div>
             </div>
