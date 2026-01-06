@@ -130,3 +130,29 @@ export async function POST(req: Request) {
         return new NextResponse("Erreur serveur lors de la sauvegarde des données du tissu.", { status: 500 });
     }
 }
+
+export async function GET() {
+    try {
+        const tissus = await prisma.tissu.findMany({
+            include: {
+                fournisseur: {
+                    select: {
+                        nom_societe: true,
+                    },
+                },
+            },
+            orderBy: {
+                id: 'desc'
+            }
+        });
+
+        // Add full url for image if needed, or just return as is (client handles it)
+        return NextResponse.json({ success: true, tissus });
+    } catch (error) {
+        console.error("Erreur lors de la récupération des tissus:", error);
+        return NextResponse.json(
+            { success: false, message: "Erreur serveur lors de la récupération des tissus." },
+            { status: 500 }
+        );
+    }
+}
