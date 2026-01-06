@@ -32,7 +32,7 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
     const nameLabel = `${tissu.matiere} ${tissu.couleur}`;
 
     return (
-        <div className="flex min-h-screen flex-col bg-white pb-24">
+        <div className="flex min-h-screen flex-col bg-[#f2f2f2] pb-24">
             <header className="px-4 pt-10 pb-4 flex items-center justify-between">
                 <button
                     type="button"
@@ -61,7 +61,7 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
                 </div>
             </header>
 
-            <main className="mx-auto w-full max-w-2xl px-4 space-y-6">
+            <main className="w-full px-4 space-y-6">
                 {/* IMAGE */}
                 <div className="flex justify-center">
                     <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-gray-50 shadow-sm">
@@ -83,7 +83,7 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
                 </div>
 
                 {/* DETAILS */}
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-6">
                     <section className="space-y-1">
                         <h1 className="text-xl font-semibold leading-snug text-gray-900 sm:text-2xl">
                             {nameLabel}
@@ -96,7 +96,7 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
                         </p>
                     </section>
 
-                    <section className="mt-6 space-y-3">
+                    <section className="space-y-3">
                         <div className="flex flex-wrap items-end gap-3">
                             <p className="text-3xl font-lusitana text-gray-900 sm:text-4xl">
                                 {priceLabel} <span className="text-base font-normal text-gray-900">/ mètre</span>
@@ -139,7 +139,7 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
             </main>
 
             <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-5 pb-6 pt-3 shadow-[0_-6px_30px_rgba(0,0,0,0.06)] backdrop-blur">
-                <div className="mx-auto w-full max-w-2xl px-4">
+                <div className="w-full px-4">
                     <button
                         type="button"
                         className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--color-creator,#4b2d52)] px-6 py-3 text-base font-semibold text-white transition hover:opacity-95"

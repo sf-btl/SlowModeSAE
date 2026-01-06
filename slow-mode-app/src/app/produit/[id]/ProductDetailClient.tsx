@@ -86,7 +86,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
   const showToggle = product.description && product.description.length > 160;
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-white text-gray-900">
+    <div className="flex min-h-screen w-full flex-col bg-[#f2f2f2] text-gray-900">
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 bg-white/90 px-5 py-4 backdrop-blur md:px-8">
         <button
           type="button"
@@ -114,17 +114,17 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
         </div>
       </header>
 
-      <main className="mx-auto flex-1 w-full max-w-6xl px-5 pb-32 pt-2 md:px-8 lg:pb-36">
-        <div className="grid gap-8 md:grid-cols-[1.05fr,1fr] lg:grid-cols-[1.1fr,1fr] lg:gap-12">
+      <main className="flex-1 w-full px-4 pb-32 pt-4 space-y-6">
+        <div className="flex flex-col gap-6">
           <div className="flex justify-center">
-            <div className="relative h-72 w-full max-w-[380px] overflow-hidden rounded-3xl bg-gray-50 shadow-sm sm:h-80 md:max-w-full lg:h-[440px]">
+            <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-gray-50 shadow-sm">
               {product.imagePath ? (
                 <Image
                   src={product.imagePath}
                   alt={product.name}
                   fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 88vw, (max-width: 1024px) 46vw, 560px"
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 600px"
                   priority
                 />
               ) : (
@@ -136,8 +136,8 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
           </div>
 
           <div className="flex flex-col">
-            <section className="mt-2 space-y-1 md:mt-0">
-              <h1 className="text-xl font-semibold leading-snug text-gray-900 sm:text-2xl lg:text-[1.7rem]">
+            <section className="space-y-1">
+              <h1 className="text-xl font-semibold leading-snug text-gray-900 sm:text-2xl">
                 {product.name}
               </h1>
               <p className="text-sm text-gray-600">
@@ -195,7 +195,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                 )}
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm lg:p-5">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
                   <Star className="h-4 w-4 text-amber-500" />
                   Description
@@ -235,14 +235,16 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-5 pb-6 pt-3 shadow-[0_-6px_30px_rgba(0,0,0,0.06)] backdrop-blur md:px-8">
-        <button
-          type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--color-creator,#4b2d52)] px-6 py-3 text-base font-semibold text-white transition hover:opacity-95"
-        >
-          <ShoppingCart className="h-5 w-5" />
-          Ajouter au panier
-        </button>
+      <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-5 pb-6 pt-3 shadow-[0_-6px_30px_rgba(0,0,0,0.06)] backdrop-blur">
+        <div className="w-full px-4">
+          <button
+            type="button"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--color-creator,#4b2d52)] px-6 py-3 text-base font-semibold text-white transition hover:opacity-95"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            Ajouter au panier
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -75,7 +75,7 @@ export default function AjouterProduit() {
       </h1>
 
       <div className="flex-1 w-full flex items-start justify-center">
-        <div className="w-full max-w-[380px] px-6">
+        <div className="w-full px-4">
           <form onSubmit={handleSubmit} className="space-y-6">
 
             {/* CHAMPS PRODUIT (Conservés) */}

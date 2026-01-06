@@ -105,7 +105,7 @@ export default function AnnuairePage() {
 
   return (
     <div className="min-h-screen bg-[#f2f2f2] font-inter">
-      <div className="mx-auto flex w-full max-w-md flex-col px-4 pb-24 pt-6 sm:max-w-lg">
+      <div className="flex w-full flex-col px-4 pb-24 pt-6">
         <div className="flex items-center gap-3">
           <div className="flex flex-1 items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm">
             <span className="text-[#3c2a5d]" aria-hidden="true">
@@ -274,11 +274,10 @@ export default function AnnuairePage() {
                   >
                     <span>{SORT_LABELS[option]}</span>
                     <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                        sortOption === option
-                          ? "border-[#3c2a5d]"
-                          : "border-[#d7d3db]"
-                      }`}
+                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${sortOption === option
+                        ? "border-[#3c2a5d]"
+                        : "border-[#d7d3db]"
+                        }`}
                     >
                       {sortOption === option ? (
                         <span className="h-2.5 w-2.5 rounded-full bg-[#3c2a5d]" />
