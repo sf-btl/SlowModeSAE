@@ -53,6 +53,10 @@ export async function POST(req: Request) {
     const description = formData.get("description") as string;
     const prix = Number(formData.get("prix"));
     const stock = Number(formData.get("stock"));
+    // On récupère la catégorie. On peut caster en "any" pour éviter les soucis de typage strict ici,
+    // ou importer l'enum depuis @prisma/client si on veut être rigoureux.
+    const categorie = formData.get("categorie") as any;
+
     const createPost = formData.get("createPost") === "true";
     const titrePost = formData.get("titrePost") as string | null;
     const descriptionPost = formData.get("descriptionPost") as string | null;
@@ -89,6 +93,7 @@ export async function POST(req: Request) {
                 description,
                 prix_unitaire: prix,
                 stock,
+                categorie: categorie || 'AUTRE', // Valeur par défaut si vide
                 couturierId,
                 imagePath: imagePath,
             },

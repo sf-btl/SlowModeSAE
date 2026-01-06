@@ -12,6 +12,7 @@ export default function AjouterProduit() {
   const [description, setDescription] = useState("");
   const [prix, setPrix] = useState("");
   const [stock, setStock] = useState("");
+  const [categorie, setCategorie] = useState("AUTRE");
   const [image, setImage] = useState<File | null>(null);
 
   // État pour le POST (Publication)
@@ -32,6 +33,7 @@ export default function AjouterProduit() {
     formData.append("description", description);
     formData.append("prix", prix);
     formData.append("stock", stock);
+    formData.append("categorie", categorie);
     formData.append("createPost", String(createPost));
     if (image) formData.append("image", image);
 
@@ -94,6 +96,26 @@ export default function AjouterProduit() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+
+            {/* Catégorie */}
+            <select
+              id="categorieProduit"
+              value={categorie}
+              onChange={(e) => setCategorie(e.target.value)}
+              className="w-full p-3 rounded-md bg-input-bg font-montserrat text-black focus:outline-none focus:ring-2 focus:ring-zinc-500 appearance-none cursor-pointer"
+            >
+              <option value="AUTRE">Autre</option>
+              <option value="CHEMISE">Chemise</option>
+              <option value="T_SHIRT">T-shirt</option>
+              <option value="PULL">Pull</option>
+              <option value="VESTE">Veste</option>
+              <option value="MANTEAU">Manteau</option>
+              <option value="PANTALON">Pantalon</option>
+              <option value="JUPE">Jupe</option>
+              <option value="ROBE">Robe</option>
+              <option value="COMBINAISON">Combinaison</option>
+              <option value="ACCESSOIRE">Accessoire</option>
+            </select>
             {/* ... Prix et Stock (conservés) ... */}
             <input
               id="prixProduit"
