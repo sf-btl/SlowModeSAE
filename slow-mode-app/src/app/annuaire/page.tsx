@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import Link from "next/link";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 type SortOption = "pertinence" | "distance" | "note";
@@ -203,9 +204,10 @@ export default function AnnuairePage() {
             const roleBadgeColor = isCreator ? "bg-[#283618]" : "bg-[#03045E]";
 
             return (
-              <div
-                key={entry.id}
-                className="flex items-center gap-4 rounded-2xl bg-white px-4 py-3 shadow-sm"
+              <Link
+                href={`/profil/${entry.id}`}
+                key={`${entry.id}-${entry.role}`}
+                className="flex items-center gap-4 rounded-2xl bg-white px-4 py-3 shadow-sm transition hover:bg-gray-50"
               >
                 <div
                   className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold font-lusitana text-white shadow ${roleBadgeColor}`}
@@ -234,7 +236,7 @@ export default function AnnuairePage() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
           {!isLoading && !errorMessage && sortedEntries.length === 0 ? (
@@ -274,11 +276,10 @@ export default function AnnuairePage() {
                   >
                     <span>{SORT_LABELS[option]}</span>
                     <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                        sortOption === option
-                          ? "border-[#3c2a5d]"
-                          : "border-[#d7d3db]"
-                      }`}
+                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${sortOption === option
+                        ? "border-[#3c2a5d]"
+                        : "border-[#d7d3db]"
+                        }`}
                     >
                       {sortOption === option ? (
                         <span className="h-2.5 w-2.5 rounded-full bg-[#3c2a5d]" />

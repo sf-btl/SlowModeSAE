@@ -15,7 +15,7 @@ export async function GET() {
 
     const entries = [
       ...couturiers.map((couturier) => ({
-        id: `couturier-${couturier.utilisateurId}`,
+        id: couturier.utilisateurId.toString(),
         name: `${couturier.utilisateur.prenom} ${couturier.utilisateur.nom}`.trim(),
         role: "Créateur" as const,
         rating: couturier.note_moyenne ?? 0,
@@ -25,7 +25,7 @@ export async function GET() {
           undefined,
       })),
       ...fournisseurs.map((fournisseur) => ({
-        id: `fournisseur-${fournisseur.utilisateurId}`,
+        id: fournisseur.utilisateurId.toString(),
         name:
           fournisseur.nom_societe ||
           `${fournisseur.utilisateur.prenom} ${fournisseur.utilisateur.nom}`.trim(),
