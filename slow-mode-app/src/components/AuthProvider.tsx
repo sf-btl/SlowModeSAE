@@ -8,6 +8,8 @@ interface UserData {
   nom: string;
   prenom: string;
   accountType: string;
+  adresse_postale?: string;
+  ville?: string;
 }
 
 interface AuthContextType {
@@ -41,7 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await response.json();
 
       if (result.success) {
-        setUser(result.data);
+        // Ajout d'une compatibilité pour l'adresse postale et la ville
+        setUser({
+          ...result.data,
+          adresse_postale: result.data.adresse_postale || '',
+          ville: result.data.ville || '',
+        });
         // Vérifier si le token doit être rafraîchi
         await refreshTokenIfNeeded();
       } else {

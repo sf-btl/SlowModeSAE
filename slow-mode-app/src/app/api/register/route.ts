@@ -11,7 +11,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const {
       accountType,
-      department,
+      adresse_postale,
+      ville,
       firstName,
       lastName,
       companyName,
@@ -84,8 +85,8 @@ export async function POST(request: Request) {
           mot_de_passe: hashedPassword,
           nom: companyName || '',
           prenom: '',
-          ville: department || null,
-          adresse_postale: department || null,
+          adresse_postale: adresse_postale || null,
+          ville: ville || null,
           fournisseur: {
             create: {
               siret: siret!,
@@ -104,7 +105,9 @@ export async function POST(request: Request) {
         email: user.email,
         nom: user.nom,
         prenom: user.prenom,
-        accountType: 'fournisseur'
+        accountType: 'fournisseur',
+        adresse_postale: user.adresse_postale || null,
+        ville: user.ville || null
       });
 
       await setAuthCookie(token);
@@ -126,8 +129,8 @@ export async function POST(request: Request) {
         mot_de_passe: hashedPassword,
         nom: lastName || '',
         prenom: firstName || '',
-        ville: department || null,
-        adresse_postale: department || null,
+        adresse_postale: adresse_postale || null,
+        ville: ville || null,
       };
 
       if (accountType === 'particulier') {
@@ -150,7 +153,9 @@ export async function POST(request: Request) {
           email: user.email,
           nom: user.nom,
           prenom: user.prenom,
-          accountType: 'acheteur'
+          accountType: 'acheteur',
+          adresse_postale: user.adresse_postale || null,
+          ville: user.ville || null
         });
 
         await setAuthCookie(token);
@@ -185,7 +190,9 @@ export async function POST(request: Request) {
           email: user.email,
           nom: user.nom,
           prenom: user.prenom,
-          accountType: 'couturier'
+          accountType: 'couturier',
+          adresse_postale: user.adresse_postale || null,
+          ville: user.ville || null
         });
 
         await setAuthCookie(token);

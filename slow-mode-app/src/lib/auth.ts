@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import { prisma } from './prisma';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt_tres_securise_changez_moi';
 
@@ -9,6 +10,8 @@ export interface JWTPayload {
   accountType: string;
   nom: string;
   prenom: string;
+  adresse_postale?: string;
+  ville?: string;
 }
 
 export async function createToken(payload: JWTPayload): Promise<string> {
@@ -74,5 +77,9 @@ export async function removeAuthCookie() {
 export async function getCurrentUser(): Promise<JWTPayload | null> {
   const token = await getAuthToken();
   if (!token) return null;
+  const payload = await verifyToken(token);
+  if (!payload) return null;
   return verifyToken(token);
+  // Récupère l'utilisateur à jour depuis la base
+
 }

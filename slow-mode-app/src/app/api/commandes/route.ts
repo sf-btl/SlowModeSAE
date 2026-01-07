@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+
 
 function formatCommandeId(id: number) {
   return `CMD-${String(id).padStart(3, "0")}`;

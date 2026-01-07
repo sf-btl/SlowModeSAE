@@ -68,7 +68,7 @@ export default function ForgotPassword() {
               </div>
 
               {/* Message */}
-              <div className="text-left space-y-4 mb-8">
+              <div className="text-left space-y-4 mb-6">
                 <p className="text-black font-montserrat text-base">
                   Un lien de récupération a été envoyé à :
                 </p>
@@ -82,7 +82,7 @@ export default function ForgotPassword() {
               </div>
 
               {/* Bouton retour */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <Button
                   onClick={handleBackToLogin}
                   className="w-full"
@@ -118,7 +118,7 @@ export default function ForgotPassword() {
             {/* Titre du formulaire */}
             <div className="text-left">
               <h2 className="text-2xl text-black font-lusitana mb-4">Mot de passe oublié</h2>
-              <p className="text-zinc-600 font-montserrat text-sm mb-8">
+              <p className="text-zinc-600 font-montserrat text-sm mb-6">
                 Saisissez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.
               </p>
             </div>
@@ -138,7 +138,7 @@ export default function ForgotPassword() {
             </div>
 
             {/* Zone d'erreur avec hauteur fixe */}
-            <div className="h-6 mb-8">
+            <div className="h-6 mb-6">
               {emailError && (
                 <div className="text-rose-800 text-xs sm:text-sm font-montserrat">
                   {emailError}
@@ -147,7 +147,7 @@ export default function ForgotPassword() {
             </div>
 
             {/* Bouton d'envoi */}
-            <div className="mb-8">
+            <div className="mb-6">
               <Button
                 type="submit"
                 className="w-full"

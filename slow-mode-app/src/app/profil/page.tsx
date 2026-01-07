@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
+import Header from "@/components/Header";
 import { useAuth } from "@/components/AuthProvider";
 import {
   ChevronRight,
@@ -200,9 +201,7 @@ export default function ProfilPage() {
   return (
     <>
       <div className="flex min-h-screen flex-col bg-white pb-24">
-        <header className="px-4 pt-10 pb-4">
-          <h1 className="text-xl font-semibold">Profil</h1>
-        </header>
+        <Header title="Profil" />
 
         <main className="mx-auto w-full max-w-2xl px-4 space-y-6">
           {/* ===== PROFILE CARD ===== */}
@@ -222,7 +221,13 @@ export default function ProfilPage() {
 
               <div className="mt-2 flex items-center justify-center gap-2 text-sm text-gray-900">
                 <MapPin className="h-4 w-4" />
-                <span>Localité non renseignée</span>
+                <span>
+                  {(user.ville && user.ville.trim() !== '')
+                    ? user.ville
+                    : (user.adresse_postale && user.adresse_postale.trim() !== ''
+                        ? user.adresse_postale
+                        : 'Localité non renseignée')}
+                </span>
               </div>
 
               <p className="mt-1 text-sm text-gray-900">{user.email}</p>
@@ -233,7 +238,11 @@ export default function ProfilPage() {
           <section className="overflow-hidden rounded-2xl border bg-white shadow-sm">
             <MenuButton label="Mon profil" icon={UserRound} href="/profil" />
             <MenuButton label="Articles favoris" icon={Heart} />
-            <MenuButton label="Mes commandes" icon={ShoppingBag} href="/commandes" />
+            {['couturier', 'fournisseur'].includes(user.accountType) ? (
+              <MenuButton label="Dashboard" icon={ShoppingBag} href="/dashboard" />
+            ) : (
+              <MenuButton label="Mes commandes" icon={ShoppingBag} href="/commandes" />
+            )}
           </section>
 
           <section className="overflow-hidden rounded-2xl border bg-white shadow-sm">
@@ -246,7 +255,7 @@ export default function ProfilPage() {
             <section className="rounded-2xl border bg-white p-4 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <ImageIcon className="h-5 w-5 text-[#4b2d52]" />
-                <h2 className="text-sm font-semibold">Publications</h2>
+                <h2 className="text-sm font-semibold text-gray-900">Publications</h2>
               </div>
 
               {loadingPosts ? (
@@ -308,14 +317,14 @@ export default function ProfilPage() {
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold text-gray-900 ">
               Confirmer la déconnexion
             </h2>
 
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="rounded-md border px-4 py-2 text-sm"
+                className="text-gray-900 rounded-md border px-4 py-2 text-sm"
               >
                 Annuler
               </button>

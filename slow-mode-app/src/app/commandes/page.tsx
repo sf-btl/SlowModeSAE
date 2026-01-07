@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
+import Header from "@/components/Header";
 
 type CommandeItem = {
   id: number;
@@ -32,9 +33,7 @@ export default function CommandesPage() {
 
   return (
     <div className="min-h-screen bg-white pb-24 font-montserrat text-[#1e1b24]">
-      <div className="mx-auto w-full max-w-md px-5 pt-8">
-        <h1 className="text-xl font-semibold">Mes commandes</h1>
-      </div>
+      <Header title="Mes commandes" />
 
       <div className="mt-6 border-t border-gray-200">
         {loading && (

@@ -6,6 +6,7 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Alert from '@/components/Alert';
 import { EmailIcon, PasswordIcon, ProfilIcon, PhoneIcon, CompanyIcon, SiretIcon, ArrowBackIcon } from '@/components/Icons';
+import { MapPin } from 'lucide-react';
 
 export default function Register() {
   const [showFullForm, setShowFullForm] = useState(false);
@@ -19,6 +20,8 @@ export default function Register() {
   const [countryCode, setCountryCode] = useState('+33');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [adressePostale, setAdressePostale] = useState('');
+  const [ville, setVille] = useState('');
 
   // Liste des départements français (exemples) mettre db plus tard
   const departments = [
@@ -211,7 +214,8 @@ export default function Register() {
     
     const data = {
       accountType,
-      department,
+      adresse_postale: formData.get('adresse_postale') as string,
+      ville: formData.get('ville') as string,
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
       companyName: formData.get('companyName') as string,
@@ -219,7 +223,7 @@ export default function Register() {
       email: formData.get('email') as string,
       password,
       phoneNumber,
-      countryCode
+      countryCode,
     };
 
     try {
@@ -286,7 +290,7 @@ export default function Register() {
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Titre du formulaire */}
               <div className="text-left">
-                  <h2 className="text-2xl text-black font-lusitana mb-8">{getFormTitle()}</h2>
+                  <h2 className="text-2xl text-black font-lusitana mb-6">{getFormTitle()}</h2>
               </div>
 
               {/* Alerte */}
@@ -306,7 +310,7 @@ export default function Register() {
               {accountType === 'entreprise' ? (
                 <>
                   {/* Champ Société */}
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <Input
                       id="companyName"
                       name="companyName"
@@ -318,7 +322,7 @@ export default function Register() {
                   </div>
 
                   {/* Champ N° Siret */}
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <Input
                       id="siret"
                       name="siret"
@@ -332,7 +336,7 @@ export default function Register() {
               ) : (
                 <>
                   {/* Champ Prénom */}
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <Input
                       id="firstName"
                       name="firstName"
@@ -344,7 +348,7 @@ export default function Register() {
                   </div>
 
                   {/* Champ Nom */}
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <Input
                       id="lastName"
                       name="lastName"
@@ -357,8 +361,37 @@ export default function Register() {
                 </>
               )}
 
+
+              {/* Champ Adresse postale (commun à tous) */}
+              <div className="mb-6">
+                <Input
+                  id="adresse_postale"
+                  name="adresse_postale"
+                  type="text"
+                  required
+                  value={adressePostale}
+                  onChange={e => setAdressePostale(e.target.value)}
+                  placeholder="Adresse postale (rue, numéro, etc.)"
+                  icon={<MapPin className="w-5 h-5 text-gray-900" />}
+                />
+              </div>
+
+              {/* Champ Ville (commun à tous) */}
+              <div className="mb-6">
+                <Input
+                  id="ville"
+                  name="ville"
+                  type="text"
+                  required
+                  value={ville}
+                  onChange={e => setVille(e.target.value)}
+                  placeholder="Ville"
+                  icon={<MapPin className="w-5 h-5 text-gray-900" />}
+                />
+              </div>
+
               {/* Champ Email (commun à tous) */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <Input
                   id="email"
                   name="email"
@@ -370,7 +403,7 @@ export default function Register() {
               </div>
 
               {/* Champ Mot de passe (commun à tous) */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <Input
                   id="password"
                   type="password"
@@ -411,7 +444,7 @@ export default function Register() {
               </div>
 
               {/* Champ Numéro de Téléphone avec code pays */}
-              <div className="relative mb-8">
+              <div className="relative mb-6">
                 <div className="flex">
                   {/* Sélecteur de code pays */}
                   <select
@@ -445,7 +478,7 @@ export default function Register() {
               </div>
 
               {/* Bouton d'inscription */}
-              <div className="mb-8">
+              <div className="mb-6">
                   <Button
                   type="submit"
                   className="w-full"
@@ -481,11 +514,11 @@ export default function Register() {
           <div className="space-y-6">
             {/* Titre */}
             <div className="text-left">
-              <h2 className="text-2xl text-black font-lusitana mb-8">Commençons</h2>
+              <h2 className="text-2xl text-black font-lusitana mb-6">Commençons</h2>
             </div>
 
             {/* Type de compte */}
-            <div className="mb-8">
+            <div className="mb-6">
               <label className="block text-sm font-medium text-zinc-700 mb-2 font-montserrat">
                 Type de compte
               </label>
@@ -502,7 +535,7 @@ export default function Register() {
             </div>
 
             {/* Département */}
-            <div className="mb-8 relative">
+            <div className="mb-6 relative">
               <label className="block text-sm font-medium text-zinc-800 mb-2 font-montserrat">
                 Choisissez votre localité
               </label>
@@ -536,7 +569,7 @@ export default function Register() {
             </div>
 
             {/* Bouton Continuer */}
-            <div className="mb-8">
+            <div className="mb-6">
               <Button
                 onClick={handleContinue}
                 disabled={!accountType || !department}
