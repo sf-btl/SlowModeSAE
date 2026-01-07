@@ -2,6 +2,7 @@
 
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
 import { useCart } from "@/components/CartProvider";
+import { useState } from "react";
 
 export default function CartPage() {
   const {
@@ -10,7 +11,39 @@ export default function CartPage() {
     removeFromCart,
     getTotalItems,
     getTotalPrice,
+    clearCart,
   } = useCart();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/commande", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items,
+          total: getTotalPrice(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Commande validée avec succès !");
+        clearCart();
+        window.location.href = "/profil"; // Redirection vers le profil
+      } else {
+        alert("Erreur: " + data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Erreur lors de la commande");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -177,8 +210,12 @@ export default function CartPage() {
             <span>{getTotalPrice().toFixed(2)} €</span>
           </div>
 
-          <button className="w-full mt-6 bg-black text-white py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors">
-            Passer la commande
+          <button
+            onClick={handleCheckout}
+            disabled={isLoading}
+            className="w-full mt-6 bg-black text-white py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Traitement..." : "Passer la commande"}
           </button>
         </div>
       </div>
