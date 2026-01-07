@@ -134,6 +134,17 @@ export default function PublicProfilPage({ params }: { params: Promise<{ id: str
                     </div>
                 </section>
 
+                {profile.role === "couturier" && (
+                    <section className="rounded-2xl bg-white p-4 shadow-sm">
+                        <Link
+                            href={`/nouveau-projet?couturierId=${profile.id}`}
+                            className="block w-full rounded-full bg-[#3c2a5d] px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
+                        >
+                            Nouveau projet
+                        </Link>
+                    </section>
+                )}
+
                 {/* POSTS */}
                 <section className="rounded-2xl border bg-white p-4 shadow-sm">
                     <div className="mb-4 flex items-center gap-2 border-b pb-2">

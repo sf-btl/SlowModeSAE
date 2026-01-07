@@ -80,6 +80,7 @@ model Commande {
   statut            String   @default("EN_ATTENTE")
   adresse_livraison String
   montant_total     Float
+  type              CommandeType @default(PRODUIT)
 
   // Relations : Note que le champ de liaison change de nom pour être plus clair
   // Il pointe maintenant vers "utilisateurId" de la table Acheteur/Couturier
@@ -94,6 +95,40 @@ model Commande {
   fournisseur   Fournisseur? @relation(fields: [fournisseurId], references: [utilisateurId])
 
   lignes LigneCommande[]
+  projet ProjetCommande?
+}
+
+enum CommandeType {
+  PRODUIT
+  PROJET
+}
+
+enum TypeProjet {
+  CREATION
+  RETOUCHE
+}
+
+enum CategorieVetement {
+  TOPS
+  BOTTOMS
+  FULL_BODY
+  OUTERWEAR
+  LINGERIE
+  ACCESSORIES
+}
+
+model ProjetCommande {
+  id             Int      @id @default(autoincrement())
+  commandeId     Int      @unique
+  commande       Commande @relation(fields: [commandeId], references: [id])
+
+  typeProjet     TypeProjet
+  categorie      CategorieVetement
+  tissuId        Int?
+  tissu          Tissu?   @relation(fields: [tissuId], references: [id])
+  description    String?
+  images         String[]
+  mensurations   Json
 }
 
 model LigneCommande {
@@ -188,4 +223,5 @@ model Tissu {
   
   lignes        LigneCommande[]
   posts         Post[]
+  projets       ProjetCommande[]
 }

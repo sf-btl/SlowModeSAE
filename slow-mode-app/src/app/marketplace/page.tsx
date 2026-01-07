@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Heart, ShoppingCart, Search, Home, User, Package } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft, Heart, ShoppingCart, Search, Home, User, Package } from 'lucide-react';
 
 // Types basés sur votre schéma Prisma
 interface Tissu {
@@ -47,7 +48,13 @@ const detectCategory = (nomProduit: string): string => {
 };
 
 export default function FeedPage() {
-  const [activeTab, setActiveTab] = useState<'patrons' | 'tissus'>('patrons');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const selectionMode = searchParams.get('selection') === '1';
+  const categoryParam = searchParams.get('category');
+  const [activeTab, setActiveTab] = useState<'patrons' | 'tissus'>(
+    selectionMode ? 'tissus' : 'patrons'
+  );
   const [products, setProducts] = useState<Product[]>([]);
   const [tissus, setTissus] = useState<Tissu[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,6 +63,14 @@ export default function FeedPage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const categories = ['Tout', 'Pantalon', 'Chemise', 'Robe', 'Veste'];
+
+  useEffect(() => {
+    if (selectionMode) {
+      setActiveTab('tissus');
+      setSelectedCategory('Tout');
+      setIsDropdownOpen(false);
+    }
+  }, [selectionMode]);
 
   useEffect(() => {
     if (activeTab === 'patrons') {
@@ -148,51 +163,71 @@ export default function FeedPage() {
       {/* Header */}
       <header className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 z-20">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 font-lusitana">SlowMode</h1>
-          <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <Heart size={24} className="text-gray-700" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <Search size={24} className="text-gray-700" />
-            </button>
-          </div>
+          {selectionMode ? (
+            <>
+              <button
+                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
+                onClick={() => router.push('/nouveau-projet/tissu')}
+              >
+                <ArrowLeft size={18} />
+                Retour
+              </button>
+              <h1 className="text-lg font-semibold text-gray-900 font-lusitana">
+                Choisir un tissu
+              </h1>
+              <span className="w-10" aria-hidden="true" />
+            </>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold text-gray-900 font-lusitana">SlowMode</h1>
+              <div className="flex items-center gap-3">
+                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <Heart size={24} className="text-gray-700" />
+                </button>
+                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <Search size={24} className="text-gray-700" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </header>
 
       {/* Tabs Patrons / Tissus */}
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="flex gap-2 bg-white">
-          <button
-            onClick={() => setActiveTab('patrons')}
-            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
-              activeTab === 'patrons'
-                ? 'bg-gray-100 text-gray-900'
-                : 'bg-transparent text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <Package size={18} />
-            Patrons
-          </button>
-          <button
-            onClick={() => setActiveTab('tissus')}
-            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
-              activeTab === 'tissus'
-                ? 'bg-gray-100 text-gray-900'
-                : 'bg-transparent text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
-            </svg>
-            Tissus
-          </button>
+      {!selectionMode && (
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex gap-2 bg-white">
+            <button
+              onClick={() => setActiveTab('patrons')}
+              className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
+                activeTab === 'patrons'
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'bg-transparent text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <Package size={18} />
+              Patrons
+            </button>
+            <button
+              onClick={() => setActiveTab('tissus')}
+              className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
+                activeTab === 'tissus'
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'bg-transparent text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+              </svg>
+              Tissus
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Filtre de catégories - Seulement pour Patrons */}
-      {activeTab === 'patrons' && (
+      {activeTab === 'patrons' && !selectionMode && (
         <div className="max-w-4xl mx-auto px-4 pb-4">
           <div className="relative">
             <button
@@ -242,7 +277,7 @@ export default function FeedPage() {
       )}
 
       {/* Feed Patrons */}
-      {activeTab === 'patrons' && (
+      {activeTab === 'patrons' && !selectionMode && (
         <div className="max-w-4xl mx-auto">
           {products.length === 0 ? (
             <div className="text-center py-12">
@@ -338,7 +373,11 @@ export default function FeedPage() {
                 <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 mx-4">
                   <div 
                     className="relative w-full aspect-[4/5] bg-gray-50 cursor-pointer overflow-hidden"
-                    onClick={() => window.location.href = `/tissu/${tissu.id}`}
+                    onClick={() =>
+                      (window.location.href = selectionMode
+                        ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
+                        : `/tissu/${tissu.id}`)
+                    }
                   >
                     <img
                       src={tissu.imagePath}
@@ -367,7 +406,11 @@ export default function FeedPage() {
                     {/* Titre */}
                     <h2 
                       className="text-xl font-bold text-gray-900 font-lusitana mb-1 cursor-pointer hover:text-cyan-950 transition-colors"
-                      onClick={() => window.location.href = `/tissu/${tissu.id}`}
+                      onClick={() =>
+                        (window.location.href = selectionMode
+                          ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
+                          : `/tissu/${tissu.id}`)
+                      }
                     >
                       {tissu.matiere} {tissu.couleur}
                     </h2>
@@ -389,7 +432,11 @@ export default function FeedPage() {
 
                     {/* Bouton */}
                     <button
-                      onClick={() => window.location.href = `/tissu/${tissu.id}`}
+                      onClick={() =>
+                        (window.location.href = selectionMode
+                          ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
+                          : `/tissu/${tissu.id}`)
+                      }
                       className="w-full py-3 rounded-xl font-semibold text-sm transition-all font-montserrat bg-black text-white hover:bg-gray-800"
                     >
                       Sélectionner
@@ -403,26 +450,28 @@ export default function FeedPage() {
       )}
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-creatorcolor border-t border-gray-700 shadow-lg z-50">
-        <div className="flex justify-around items-center h-16 max-w-xl mx-auto">
-          <button className="flex flex-col items-center justify-center p-2 text-yellow-100 font-semibold">
-            <Home size={24} className="mb-0.5" />
-            <span className="text-xs font-medium font-montserrat">Accueil</span>
-          </button>
-          <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
-            <Search size={24} className="mb-0.5" />
-            <span className="text-xs font-medium font-montserrat">Tissus</span>
-          </button>
-          <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
-            <ShoppingCart size={24} className="mb-0.5" />
-            <span className="text-xs font-medium font-montserrat">Panier</span>
-          </button>
-          <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
-            <User size={24} className="mb-0.5" />
-            <span className="text-xs font-medium font-montserrat">Profil</span>
-          </button>
-        </div>
-      </nav>
+      {!selectionMode && (
+        <nav className="fixed bottom-0 left-0 right-0 bg-creatorcolor border-t border-gray-700 shadow-lg z-50">
+          <div className="flex justify-around items-center h-16 max-w-xl mx-auto">
+            <button className="flex flex-col items-center justify-center p-2 text-yellow-100 font-semibold">
+              <Home size={24} className="mb-0.5" />
+              <span className="text-xs font-medium font-montserrat">Accueil</span>
+            </button>
+            <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
+              <Search size={24} className="mb-0.5" />
+              <span className="text-xs font-medium font-montserrat">Tissus</span>
+            </button>
+            <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
+              <ShoppingCart size={24} className="mb-0.5" />
+              <span className="text-xs font-medium font-montserrat">Panier</span>
+            </button>
+            <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
+              <User size={24} className="mb-0.5" />
+              <span className="text-xs font-medium font-montserrat">Profil</span>
+            </button>
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
