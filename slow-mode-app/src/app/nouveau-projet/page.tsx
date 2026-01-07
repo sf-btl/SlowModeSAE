@@ -1,9 +1,32 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 export default function NouveauProjetPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const couturierId = searchParams.get("couturierId");
+
+  useEffect(() => {
+    if (!couturierId) return;
+    const draft = JSON.parse(localStorage.getItem("projetDraft") || "{}");
+    localStorage.setItem(
+      "projetDraft",
+      JSON.stringify({ ...draft, couturierId: Number(couturierId) })
+    );
+  }, [couturierId]);
+
+  const handleMode = (mode: "creation" | "retouche") => {
+    const draft = JSON.parse(localStorage.getItem("projetDraft") || "{}");
+    localStorage.setItem(
+      "projetDraft",
+      JSON.stringify({ ...draft, mode })
+    );
+    router.push(`/nouveau-projet/type?mode=${mode}`);
+  };
+
   return (
     <div className="min-h-screen bg-[#f3f1f6] font-montserrat text-[#1e1b24]">
       <div className="mx-auto flex w-full max-w-md flex-col px-6 pb-24 pt-8">
@@ -43,18 +66,20 @@ export default function NouveauProjetPage() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4">
-          <Link
-            href="/nouveau-projet/type?mode=creation"
+          <button
+            type="button"
+            onClick={() => handleMode("creation")}
             className="rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
           >
             Création
-          </Link>
-          <Link
-            href="/nouveau-projet/type?mode=retouche"
+          </button>
+          <button
+            type="button"
+            onClick={() => handleMode("retouche")}
             className="rounded-full bg-[#2f3d16] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#273210]"
           >
             Retouche
-          </Link>
+          </button>
         </div>
       </div>
 

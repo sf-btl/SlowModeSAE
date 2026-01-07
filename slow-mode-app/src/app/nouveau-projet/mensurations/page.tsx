@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 type Field = {
@@ -50,7 +49,11 @@ const CATEGORY_FIELDS: Record<string, Field[]> = {
 
 export default function MensurationsPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const category = searchParams.get("category") ?? "tops";
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fields = useMemo(
     () => CATEGORY_FIELDS[category] ?? CATEGORY_FIELDS.tops,
@@ -87,18 +90,64 @@ export default function MensurationsPage() {
                 inputMode="decimal"
                 className="mt-2 w-full rounded-xl border border-[#d6d1dd] bg-white px-4 py-3 text-sm text-[#1e1b24] focus:outline-none focus:ring-2 focus:ring-[#3c2a5d]"
                 placeholder="0"
+                value={values[field.id] ?? ""}
+                onChange={(event) =>
+                  setValues((prev) => ({ ...prev, [field.id]: event.target.value }))
+                }
               />
             </label>
           ))}
         </div>
 
         <div className="mt-8">
-          <Link
-            href="/nouveau-projet/confirmation"
-            className="block w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
+          <button
+            type="button"
+            onClick={async () => {
+              const draft = JSON.parse(localStorage.getItem("projetDraft") || "{}");
+              setErrorMessage(null);
+              if (!draft.couturierId || !draft.mode) {
+                setErrorMessage("Merci de sélectionner un couturier et un type de projet.");
+                return;
+              }
+              setIsSubmitting(true);
+              try {
+                const res = await fetch("/api/projet", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    mode: draft.mode,
+                    categorie: draft.categorie ?? category,
+                    couturierId: draft.couturierId,
+                    tissuId: draft.tissuId ?? null,
+                    description: draft.description ?? "",
+                    images: draft.images ?? [],
+                    mensurations: values,
+                  }),
+                });
+                const json = await res.json();
+                if (!json?.success) {
+                  setErrorMessage(json?.message || "Erreur lors de l'envoi du projet.");
+                  return;
+                }
+                localStorage.removeItem("projetDraft");
+                router.push("/nouveau-projet/confirmation");
+              } catch (error) {
+                console.error("Creation projet erreur:", error);
+                setErrorMessage("Erreur réseau lors de l'envoi.");
+              } finally {
+                setIsSubmitting(false);
+              }
+            }}
+            className="w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f] disabled:opacity-60"
+            disabled={isSubmitting}
           >
-            Soumettre mon projet
-          </Link>
+            {isSubmitting ? "Envoi..." : "Soumettre mon projet"}
+          </button>
+          {errorMessage && (
+            <p className="mt-3 text-center text-xs text-red-600">
+              {errorMessage}
+            </p>
+          )}
         </div>
       </div>
 

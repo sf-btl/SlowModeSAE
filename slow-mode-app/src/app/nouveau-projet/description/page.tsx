@@ -1,17 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 export default function DescriptionProjetPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const category = searchParams.get("category");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [description, setDescription] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const previews = useMemo(
     () => files.map((file) => URL.createObjectURL(file)),
@@ -46,6 +48,48 @@ export default function DescriptionProjetPage() {
     setActiveIndex((prev) =>
       Math.min(prev, Math.max(0, previews.length - 2))
     );
+  };
+
+  const handleContinue = async () => {
+    setErrorMessage(null);
+    const draft = JSON.parse(localStorage.getItem("projetDraft") || "{}");
+    let uploadedImages = draft.images || [];
+
+    if (files.length > 0) {
+      try {
+        setIsUploading(true);
+        const formData = new FormData();
+        files.forEach((file) => formData.append("files", file));
+        const res = await fetch("/api/projet/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const json = await res.json();
+        if (!json?.success) {
+          setErrorMessage("Impossible d'envoyer les images. Réessayez.");
+          return;
+        }
+        uploadedImages = json.paths;
+      } catch (error) {
+        console.error("Upload images erreur:", error);
+        setErrorMessage("Erreur réseau lors de l'upload.");
+        return;
+      } finally {
+        setIsUploading(false);
+      }
+    }
+
+    localStorage.setItem(
+      "projetDraft",
+      JSON.stringify({
+        ...draft,
+        description,
+        images: uploadedImages,
+        categorie: category ?? draft.categorie,
+      })
+    );
+
+    router.push(`/nouveau-projet/mensurations${category ? `?category=${category}` : ""}`);
   };
 
   return (
@@ -159,12 +203,19 @@ export default function DescriptionProjetPage() {
         </div>
 
         <div className="mt-6">
-          <Link
-            href={`/nouveau-projet/mensurations${category ? `?category=${category}` : ""}`}
-            className="block w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
+          <button
+            type="button"
+            onClick={handleContinue}
+            className="w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f] disabled:opacity-60"
+            disabled={isUploading}
           >
-            Continuer
-          </Link>
+            {isUploading ? "Upload..." : "Continuer"}
+          </button>
+          {errorMessage && (
+            <p className="mt-3 text-center text-xs text-red-600">
+              {errorMessage}
+            </p>
+          )}
         </div>
       </div>
 

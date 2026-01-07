@@ -233,7 +233,7 @@ export default function ProfilPage() {
           <section className="overflow-hidden rounded-2xl border bg-white shadow-sm">
             <MenuButton label="Mon profil" icon={UserRound} href="/profil" />
             <MenuButton label="Articles favoris" icon={Heart} />
-            <MenuButton label="Mes commandes" icon={ShoppingBag} />
+            <MenuButton label="Mes commandes" icon={ShoppingBag} href="/commandes" />
           </section>
 
           <section className="overflow-hidden rounded-2xl border bg-white shadow-sm">

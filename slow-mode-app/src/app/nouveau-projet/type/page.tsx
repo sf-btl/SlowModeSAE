@@ -80,7 +80,7 @@ const CATEGORIES: Category[] = [
 export default function ChoisirTypeVetementPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const mode = searchParams.get("mode");
+  const mode = searchParams.get("mode") as "creation" | "retouche" | null;
   const [selected, setSelected] = useState<Category | null>(null);
 
   const modalItems = useMemo(() => selected?.items ?? [], [selected]);
@@ -116,8 +116,17 @@ export default function ChoisirTypeVetementPage() {
                 type="button"
                 className="flex h-40 w-full flex-col items-center justify-center gap-2 rounded-2xl bg-white px-3 py-4 text-center shadow-sm transition hover:shadow-md"
                 onClick={() => {
+                  const draft = JSON.parse(
+                    localStorage.getItem("projetDraft") || "{}"
+                  );
+                  localStorage.setItem(
+                    "projetDraft",
+                    JSON.stringify({ ...draft, categorie: category.id, mode: mode ?? draft.mode })
+                  );
                   const modeParam = mode ? `&mode=${mode}` : "";
-                  router.push(`/nouveau-projet/tissu?category=${category.id}${modeParam}`);
+                  router.push(
+                    `/nouveau-projet/tissu?category=${category.id}${modeParam}`
+                  );
                 }}
               >
                 <img

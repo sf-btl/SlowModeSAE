@@ -56,6 +56,11 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
 
     const handleSelectTissu = () => {
         const category = categoryParam ? `&category=${categoryParam}` : "";
+        const draft = JSON.parse(localStorage.getItem("projetDraft") || "{}");
+        localStorage.setItem(
+            "projetDraft",
+            JSON.stringify({ ...draft, tissuId: tissu.id })
+        );
         router.push(`/nouveau-projet/description?tissu=${tissu.id}${category}`);
     };
 
