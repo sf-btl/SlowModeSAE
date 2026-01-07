@@ -135,3 +135,57 @@ export async function GET(
     return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
+
+export async function PATCH(
+  req: Request,
+  { params }: { params?: { id?: string } }
+) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ success: false, message: "Non authentifié" }, { status: 401 });
+
+    const url = new URL(req.url);
+    const pathId = url.pathname.split("/").filter(Boolean).pop() ?? "";
+    const rawId = params?.id ?? pathId;
+    const normalized = rawId.startsWith("CMD-") ? rawId.replace("CMD-", "") : rawId;
+    const commandeId = Number(normalized);
+    if (Number.isNaN(commandeId)) return NextResponse.json({ success: false, message: "Identifiant invalide." }, { status: 400 });
+
+    const commande = await prisma.commande.findUnique({ where: { id: commandeId } });
+    if (!commande) return NextResponse.json({ success: false, message: "Commande introuvable." }, { status: 404 });
+
+    // Seuls les pros impliqués (couturier/fournisseur) peuvent avancer le statut
+    const isProInvolved = commande.couturierId === user.userId || commande.fournisseurId === user.userId;
+    if (!isProInvolved) return NextResponse.json({ success: false, message: "Accès refusé." }, { status: 403 });
+
+    const body = await req.json().catch(() => ({}));
+    const action = (body.action as string) || "advance";
+
+    const orderStatuses = [
+      "EN_ATTENTE_VALIDATION",
+      "EN_ATTENTE",
+      "EN_COURS",
+      "EXPEDIEE",
+      "TERMINEE",
+    ];
+
+    let newStatus = commande.statut;
+    if (action === "advance") {
+      const idx = orderStatuses.indexOf(commande.statut);
+      if (idx === -1) {
+        newStatus = orderStatuses[1];
+      } else if (idx < orderStatuses.length - 1) {
+        newStatus = orderStatuses[idx + 1];
+      }
+    } else if (action === "set" && body.status) {
+      if (orderStatuses.includes(body.status)) newStatus = body.status;
+    }
+
+    const updated = await prisma.commande.update({ where: { id: commandeId }, data: { statut: newStatus } });
+
+    return NextResponse.json({ success: true, statut: updated.statut });
+  } catch (error: any) {
+    console.error("Commande PATCH erreur:", error);
+    return NextResponse.json({ success: false, message: "Erreur serveur." }, { status: 500 });
+  }
+}

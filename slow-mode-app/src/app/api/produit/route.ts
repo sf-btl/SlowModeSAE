@@ -119,3 +119,27 @@ export async function POST(req: Request) {
         return new NextResponse("Erreur serveur lors de la sauvegarde des données.", { status: 500 });
     }
 }
+
+export async function GET(req: Request) {
+    const userSession = await getCurrentUser();
+    if (!userSession) {
+        return NextResponse.json({ success: false, message: 'Authentification requise.' }, { status: 401 });
+    }
+
+    const { userId, accountType } = userSession;
+
+    try {
+        if (accountType !== 'couturier') {
+            return NextResponse.json({ success: false, message: 'Accès refusé. Seuls les couturiers ont une liste de produits.' }, { status: 403 });
+        }
+
+        const produits = await prisma.produit.findMany({ where: { couturierId: userId }, orderBy: { id: 'desc' } });
+
+        const payload = produits.map((p) => ({ id: p.id, nom: p.nom_produit, prix: p.prix_unitaire, stock: p.stock, imagePath: p.imagePath, categorie: p.categorie }));
+
+        return NextResponse.json({ success: true, produits: payload });
+    } catch (error) {
+        console.error('Erreur GET produits:', error);
+        return NextResponse.json({ success: false, message: 'Erreur serveur.' }, { status: 500 });
+    }
+}

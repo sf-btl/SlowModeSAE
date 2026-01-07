@@ -28,9 +28,23 @@ export async function GET() {
     return NextResponse.json({ success: false, message: "Non authentifié" }, { status: 401 });
   }
 
+  // Pour les professionnels, on retourne les commandes où il est impliqué
+  let where: any = {};
+  if (user.accountType === "couturier") {
+    where = { couturierId: user.userId };
+  } else if (user.accountType === "fournisseur") {
+    where = { fournisseurId: user.userId };
+  } else {
+    // Par défaut, acheteur
+    where = { acheteurId: user.userId };
+  }
+
   const commandes = await prisma.commande.findMany({
-    where: { acheteurId: user.userId },
+    where,
     orderBy: { date_commande: "desc" },
+    include: {
+      acheteur: { include: { utilisateur: true } },
+    },
   });
 
   const payload = commandes.map((commande) => ({
@@ -39,6 +53,19 @@ export async function GET() {
     statut: formatStatusLabel(commande.statut),
     type: commande.type,
     progress: mapProgress(commande.statut),
+    montant_total: commande.montant_total,
+    date_commande: commande.date_commande,
+    acheteur: commande.acheteur
+      ? {
+          utilisateur: commande.acheteur.utilisateur
+            ? {
+                nom: commande.acheteur.utilisateur.nom,
+                prenom: commande.acheteur.utilisateur.prenom,
+                email: commande.acheteur.utilisateur.email,
+              }
+            : null,
+        }
+      : null,
   }));
 
   return NextResponse.json({ success: true, commandes: payload });
