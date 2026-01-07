@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
@@ -92,12 +93,12 @@ export default function MensurationsPage() {
         </div>
 
         <div className="mt-8">
-          <button
-            type="button"
-            className="w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
+          <Link
+            href="/nouveau-projet/confirmation"
+            className="block w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
           >
             Soumettre mon projet
-          </button>
+          </Link>
         </div>
       </div>
 
