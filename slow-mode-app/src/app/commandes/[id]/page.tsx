@@ -11,6 +11,16 @@ type CommandeDetail = {
   statut: string;
   type: "PRODUIT" | "PROJET";
   couturierName: string | null;
+  montant_total?: number;
+  date?: string;
+  adresse_livraison?: string;
+  lignes?: {
+    id: number;
+    quantite: number;
+    prix_unitaire: number;
+    produit: string | null;
+    tissu: string | null;
+  }[];
   projet: null | {
     typeProjet: string;
     categorie: string;
@@ -83,11 +93,27 @@ export default function CommandeDetailPage() {
         <h1 className="mt-3 text-2xl font-semibold">{commande.code}</h1>
         <p className="mt-1 text-sm text-[#3c2a5d]">{commande.statut}</p>
 
-        <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="mt-6 space-y-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="text-xs text-gray-500">Type de commande</p>
           <p className="mt-2 text-sm font-semibold">
             {commande.type === "PROJET" ? "Projet couture" : "Commande marketplace"}
           </p>
+          <div className="text-sm text-gray-700">
+            <p className="text-xs text-gray-500">Date de création</p>
+            <p>
+              {commande.date
+                ? new Date(commande.date).toLocaleDateString("fr-FR", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "-"}
+            </p>
+          </div>
+          <div className="text-sm text-gray-700">
+            <p className="text-xs text-gray-500">Adresse de livraison</p>
+            <p>{commande.adresse_livraison || "-"}</p>
+          </div>
         </div>
 
         {commande.type === "PROJET" && commande.projet && (
@@ -154,6 +180,47 @@ export default function CommandeDetailPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {commande.type === "PRODUIT" && (
+          <div className="mt-6 space-y-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div>
+              <p className="text-xs text-gray-500">Articles commandés</p>
+              <div className="mt-2 space-y-3 text-sm text-gray-700">
+                {(commande.lignes ?? []).map((ligne) => (
+                  <div
+                    key={ligne.id}
+                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
+                  >
+                    <div>
+                      <p className="font-semibold text-[#1e1b24]">
+                        {ligne.produit || ligne.tissu || "Article"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Quantité: {ligne.quantite}
+                      </p>
+                    </div>
+                    <p className="text-sm font-semibold text-[#1e1b24]">
+                      {(ligne.prix_unitaire * ligne.quantite).toFixed(2)} €
+                    </p>
+                  </div>
+                ))}
+                {(!commande.lignes || commande.lignes.length === 0) && (
+                  <p className="text-sm text-gray-500">
+                    Aucun article associé à cette commande.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-t border-gray-200 pt-3 text-sm font-semibold text-[#1e1b24]">
+              <span>Total</span>
+              <span>
+                {commande.montant_total !== undefined
+                  ? `${commande.montant_total.toFixed(2)} €`
+                  : "-"}
+              </span>
+            </div>
           </div>
         )}
       </div>

@@ -100,6 +100,7 @@ export async function GET(
         statut: formatStatusLabel(commande.statut),
         type: commande.type,
         date: commande.date_commande,
+        adresse_livraison: commande.adresse_livraison,
         montant_total: commande.montant_total,
         couturierName,
         projet: commande.projet

@@ -69,7 +69,7 @@ export async function POST(req: Request) {
                     statut: "EN_ATTENTE",
                     adresse_livraison: (user as any).adresse || "Non renseignée",
                     montant_total: group.total,
-                    type: \"PRODUIT\",
+                    type: "PRODUIT",
                 };
 
                 // Lier le vendeur
