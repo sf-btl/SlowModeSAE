@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 type Category = {
@@ -77,6 +78,9 @@ const CATEGORIES: Category[] = [
 ];
 
 export default function ChoisirTypeVetementPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode");
   const [selected, setSelected] = useState<Category | null>(null);
 
   const modalItems = useMemo(() => selected?.items ?? [], [selected]);
@@ -111,6 +115,10 @@ export default function ChoisirTypeVetementPage() {
               <button
                 type="button"
                 className="flex h-40 w-full flex-col items-center justify-center gap-2 rounded-2xl bg-white px-3 py-4 text-center shadow-sm transition hover:shadow-md"
+                onClick={() => {
+                  const modeParam = mode ? `&mode=${mode}` : "";
+                  router.push(`/nouveau-projet/tissu?category=${category.id}${modeParam}`);
+                }}
               >
                 <img
                   src={category.icon}
