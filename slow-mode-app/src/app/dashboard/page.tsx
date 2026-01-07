@@ -33,7 +33,7 @@ export default function DashboardPage() {
         const res = await fetch("/api/commandes");
         const json = await res.json();
         if (json.success) {
-          setCommandes(json.data);
+          setCommandes(json.commandes);
         }
       } catch (e) {
         // Optionally handle error
