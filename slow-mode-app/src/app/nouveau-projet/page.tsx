@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 export default function NouveauProjetPage() {
@@ -42,18 +43,18 @@ export default function NouveauProjetPage() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4">
-          <button
-            type="button"
+          <Link
+            href="/nouveau-projet/type?mode=creation"
             className="rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
           >
             Création
-          </button>
-          <button
-            type="button"
+          </Link>
+          <Link
+            href="/nouveau-projet/type?mode=retouche"
             className="rounded-full bg-[#2f3d16] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#273210]"
           >
             Retouche
-          </button>
+          </Link>
         </div>
       </div>
 
