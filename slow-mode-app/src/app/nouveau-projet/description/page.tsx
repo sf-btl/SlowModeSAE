@@ -1,9 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 export default function DescriptionProjetPage() {
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -155,12 +159,12 @@ export default function DescriptionProjetPage() {
         </div>
 
         <div className="mt-6">
-          <button
-            type="button"
-            className="w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
+          <Link
+            href={`/nouveau-projet/mensurations${category ? `?category=${category}` : ""}`}
+            className="block w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
           >
             Continuer
-          </button>
+          </Link>
         </div>
       </div>
 

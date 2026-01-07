@@ -51,6 +51,7 @@ export default function FeedPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const selectionMode = searchParams.get('selection') === '1';
+  const categoryParam = searchParams.get('category');
   const [activeTab, setActiveTab] = useState<'patrons' | 'tissus'>(
     selectionMode ? 'tissus' : 'patrons'
   );
@@ -374,7 +375,7 @@ export default function FeedPage() {
                     className="relative w-full aspect-[4/5] bg-gray-50 cursor-pointer overflow-hidden"
                     onClick={() =>
                       (window.location.href = selectionMode
-                        ? `/tissu/${tissu.id}?selection=1`
+                        ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
                         : `/tissu/${tissu.id}`)
                     }
                   >
@@ -407,7 +408,7 @@ export default function FeedPage() {
                       className="text-xl font-bold text-gray-900 font-lusitana mb-1 cursor-pointer hover:text-cyan-950 transition-colors"
                       onClick={() =>
                         (window.location.href = selectionMode
-                          ? `/tissu/${tissu.id}?selection=1`
+                          ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
                           : `/tissu/${tissu.id}`)
                       }
                     >
@@ -432,10 +433,10 @@ export default function FeedPage() {
                     {/* Bouton */}
                     <button
                       onClick={() =>
-                      (window.location.href = selectionMode
-                        ? `/tissu/${tissu.id}?selection=1`
-                        : `/tissu/${tissu.id}`)
-                    }
+                        (window.location.href = selectionMode
+                          ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
+                          : `/tissu/${tissu.id}`)
+                      }
                       className="w-full py-3 rounded-xl font-semibold text-sm transition-all font-montserrat bg-black text-white hover:bg-gray-800"
                     >
                       Sélectionner

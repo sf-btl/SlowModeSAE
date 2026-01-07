@@ -29,6 +29,7 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
     const router = useRouter();
     const searchParams = useSearchParams();
     const selectionMode = searchParams.get("selection") === "1";
+    const categoryParam = searchParams.get("category");
     const { addToCart, getTotalItems } = useCart();
     const [metrage, setMetrage] = useState(1);
     const [showAddedMessage, setShowAddedMessage] = useState(false);
@@ -54,7 +55,8 @@ export default function TissuDetailClient({ tissu }: { tissu: TissuDetailViewMod
     };
 
     const handleSelectTissu = () => {
-        router.push(`/nouveau-projet/description?tissu=${tissu.id}`);
+        const category = categoryParam ? `&category=${categoryParam}` : "";
+        router.push(`/nouveau-projet/description?tissu=${tissu.id}${category}`);
     };
 
     const incrementMetrage = () => {

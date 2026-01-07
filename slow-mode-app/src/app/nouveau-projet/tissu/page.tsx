@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 export default function ChoisirTissuPage() {
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category");
   return (
     <div className="min-h-screen bg-[#f3f1f6] font-montserrat text-[#1e1b24]">
       <div className="mx-auto flex w-full max-w-md flex-col px-6 pb-24 pt-8">
@@ -41,7 +44,7 @@ export default function ChoisirTissuPage() {
 
         <div className="mt-12">
           <Link
-            href="/marketplace?selection=1"
+            href={`/marketplace?selection=1${category ? `&category=${category}` : ""}`}
             className="block w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
           >
             Je choisis un tissu
