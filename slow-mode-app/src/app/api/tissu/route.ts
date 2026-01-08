@@ -130,3 +130,26 @@ export async function POST(req: Request) {
         return new NextResponse("Erreur serveur lors de la sauvegarde des données du tissu.", { status: 500 });
     }
 }
+
+export async function GET(req: Request) {
+    const userSession = await getCurrentUser();
+    if (!userSession) {
+        return NextResponse.json({ success: false, message: 'Authentification requise.' }, { status: 401 });
+    }
+
+    try {
+        // Seuls les fournisseurs ont une liste de tissus
+        if (userSession.accountType !== 'fournisseur') {
+            return NextResponse.json({ success: false, message: 'Accès refusé.' }, { status: 403 });
+        }
+
+        const tissus = await prisma.tissu.findMany({ where: { fournisseurId: userSession.userId }, orderBy: { id: 'desc' } });
+
+        const payload = tissus.map(t => ({ id: t.id, matiere: t.matiere, couleur: t.couleur, grammage: t.grammage, metrage_dispo: t.metrage_dispo, prix_unitaire: t.prix_unitaire, imagePath: t.imagePath }));
+
+        return NextResponse.json({ success: true, tissus: payload });
+    } catch (error) {
+        console.error('Erreur GET tissus:', error);
+        return NextResponse.json({ success: false, message: 'Erreur serveur.' }, { status: 500 });
+    }
+}
