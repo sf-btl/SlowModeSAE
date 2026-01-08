@@ -8,6 +8,9 @@ datasource db {
   provider = "postgresql"
 }
 
+// Connection URLs (DATABASE_URL) are configured outside the
+// schema for Prisma v7 (use `prisma.config.ts` or environment variables).
+
 // ==========================================
 // GESTION DES UTILISATEURS (Héritage)
 // ==========================================
@@ -53,6 +56,7 @@ model Couturier {
   patronsCrees    Patron[]
   postsPublies    Post[]
   produits        Produit[]
+  prices          CouturierPrice[]
 }
 
 model Fournisseur {
@@ -224,4 +228,17 @@ model Tissu {
   lignes        LigneCommande[]
   posts         Post[]
   projets       ProjetCommande[]
+}
+
+// Prices set by couturiers for personalized projects
+model CouturierPrice {
+  id          Int               @id @default(autoincrement())
+  couturierId Int
+  couturier   Couturier         @relation(fields: [couturierId], references: [utilisateurId])
+
+  typeProjet  TypeProjet
+  categorie   CategorieVetement?
+  prix        Float
+
+  @@unique([couturierId, typeProjet, categorie])
 }

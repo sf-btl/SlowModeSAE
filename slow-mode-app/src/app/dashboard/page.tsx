@@ -29,6 +29,10 @@ export default function DashboardPage() {
   const [tissuLoading, setTissuLoading] = useState(false);
   
   const [formState, setFormState] = useState({ nom: "", prix: "0", stock: "0", categorie: "AUTRE" });
+  const [prices, setPrices] = useState<any[]>([]);
+  const [priceForm, setPriceForm] = useState({ typeProjet: "CREATION", categorie: "", prix: "0" });
+  const [selectedType, setSelectedType] = useState<string | null>("CREATION");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>("");
   const [stats, setStats] = useState<{ total_received: number; count_received: number; total_pending: number } | null>(null);
 
   useEffect(() => {
@@ -50,7 +54,16 @@ export default function DashboardPage() {
     fetchProduits();
     fetchTissus();
     fetchStats();
+    fetchPrices();
   }, []);
+
+  async function fetchPrices() {
+    try {
+      const res = await fetch('/api/couturier/prices');
+      const j = await res.json();
+      if (j.success) setPrices(j.prices || []);
+    } catch (e) { /* ignore */ }
+  }
 
   async function fetchProduits() {
     setProdLoading(true);
@@ -242,6 +255,85 @@ export default function DashboardPage() {
                 ))}
               </ul>
             )}
+          </section>
+        )}
+
+        {user?.accountType === 'couturier' && (
+          <section className="rounded-3xl border border-zinc-100 bg-white/80 p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-sm font-semibold text-zinc-900">Prix personnalisés</h2>
+            </div>
+
+            <div className="mb-6">
+              <div className="text-xs text-zinc-600 mb-2">Type de projet</div>
+              <div className="grid grid-cols-2 gap-3">
+                {['CREATION', 'RETOUCHE'].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => { setSelectedType(t); setPriceForm(prev => ({ ...prev, typeProjet: t })); }}
+                    className={`rounded-xl border px-4 py-3 text-sm text-left ${selectedType === t ? 'border-cyan-950 bg-cyan-50' : 'border-zinc-100 bg-white'}`}>
+                    <div className="font-semibold">{t === 'CREATION' ? 'Création' : 'Retouche'}</div>
+                    <div className="text-xs text-zinc-600 mt-1">Configurer les prix par type</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <div className="text-xs text-zinc-600 mb-2">Catégorie</div>
+              <div className="grid grid-cols-3 gap-3">
+                {['', 'TOPS', 'BOTTOMS', 'FULL_BODY', 'OUTERWEAR', 'LINGERIE', 'ACCESSORIES'].map((c) => (
+                  <button
+                    key={c || 'ALL'}
+                    onClick={() => {
+                      setSelectedCategory(c);
+                      setPriceForm(prev => ({ ...prev, categorie: c }));
+                    }}
+                    className={`rounded-xl border px-3 py-2 text-sm text-center ${selectedCategory === c ? 'border-cyan-950 bg-cyan-50' : 'border-zinc-100 bg-white'}`}>
+                    <div className="font-semibold">{c === '' ? 'Toutes' : (c === 'FULL_BODY' ? 'Full body' : c.charAt(0) + c.slice(1).toLowerCase())}</div>
+                    {c !== '' && <div className="text-xs text-zinc-600 mt-1">{c === 'FULL_BODY' ? 'Full body' : c.toLowerCase()}</div>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-xs text-zinc-600">Prix (€)</label>
+              <input type="number" step="0.01" value={priceForm.prix} onChange={(e) => setPriceForm(prev => ({ ...prev, prix: e.target.value }))} className="mt-1 rounded-md border px-3 py-2 w-40" />
+            </div>
+
+            <div className="mb-6">
+              <button onClick={async () => {
+                const payload = { typeProjet: priceForm.typeProjet, categorie: priceForm.categorie || null, prix: Number(priceForm.prix) };
+                try {
+                  const res = await fetch('/api/couturier/prices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                  const j = await res.json();
+                  if (j.success) {
+                    setPriceForm({ typeProjet: 'CREATION', categorie: '', prix: '0' });
+                    fetchPrices();
+                  } else {
+                    console.error('Save price error', j);
+                  }
+                } catch (e) { console.error(e); }
+              }} className="rounded-full bg-cyan-950 text-white px-4 py-2">Enregistrer le prix</button>
+            </div>
+
+            <div>
+              {(!prices || prices.length === 0) ? <div className="text-sm text-zinc-500">Aucun prix configuré.</div> : (
+                <ul className="divide-y divide-zinc-100">
+                  {prices
+                    .filter(p => (!selectedType || p.typeProjet === selectedType) && (!selectedCategory || selectedCategory === '' || p.categorie === selectedCategory))
+                    .map(pr => (
+                    <li key={pr.id} className="py-2 flex items-center justify-between">
+                      <div className="text-sm">
+                        <div className="font-semibold">{pr.typeProjet} {pr.categorie ? `— ${pr.categorie}` : ''}</div>
+                        <div className="text-xs text-zinc-600">{Number(pr.prix).toFixed(2)} €</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </section>
         )}
 
