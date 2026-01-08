@@ -235,7 +235,15 @@ export default function AnnuairePage() {
                     {entry.rating}
                   </span>
                   <span className="font-semibold">{formatDistancePlaceholder()}</span>
-                </div>
+                  </div>
+                  {entry.locationHint ? (
+                    <div className="mt-1 text-xs text-zinc-600 flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" strokeWidth="1"/>
+                      </svg>
+                      <span>{entry.locationHint}</span>
+                    </div>
+                  ) : null}
               </div>
             </Link>
           );

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import fs from "fs/promises";
 import path from "path";
-import { getCurrentUser } from "@/lib/auth"; // Assurez-vous que cet import est correct
+import { verifyToken } from "@/lib/auth"; // use header-based cookie parsing to avoid locking
 
 // Chemin de stockage public pour les images de tissu
 // NOTE: Nous utilisons un sous-dossier 'tissus' pour l'organisation
@@ -13,12 +13,23 @@ const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "tissus");
 export async function POST(req: Request) {
 
     // ------------------------------------------
-    // 1. VÉRIFICATION DE LA SESSION ET DES DROITS
+    // 1. VÉRIFICATION DE LA SESSION ET DES DROITS (via header cookie)
     // ------------------------------------------
-    const userSession = await getCurrentUser();
+    // Read cookies from the incoming request headers to avoid using `cookies()` helper
+    const cookieHeader = req.headers.get("cookie") || "";
+    const match = cookieHeader.match(/(?:^|; )auth-token=([^;]+)/);
+    const token = match ? decodeURIComponent(match[1]) : null;
+
+    if (!token) {
+        return NextResponse.json(
+            { success: false, message: "Accès refusé. Seuls les comptes Fournisseur peuvent ajouter des tissus." },
+            { status: 401 }
+        );
+    }
+
+    const userSession = await verifyToken(token);
 
     if (!userSession || userSession.accountType !== 'fournisseur') {
-        // 401: Non authentifié, 403: Autorisation refusée (mauvais rôle)
         return NextResponse.json(
             { success: false, message: "Accès refusé. Seuls les comptes Fournisseur peuvent ajouter des tissus." },
             { status: userSession ? 403 : 401 }

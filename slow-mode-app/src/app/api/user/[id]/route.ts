@@ -21,14 +21,16 @@ export async function GET(
         const user = await prisma.utilisateur.findUnique({
             where: { id: userId },
             select: {
-                id: true,
-                nom: true,
-                prenom: true,
-                email: true,
-                // On récupère aussi les tables liées si besoin
-                couturier: { select: { bio_description: true } },
-                fournisseur: { select: { nom_societe: true } },
-            },
+                    id: true,
+                    nom: true,
+                    prenom: true,
+                    email: true,
+                    adresse_postale: true,
+                    ville: true,
+                    // On récupère aussi les tables liées si besoin
+                    couturier: { select: { bio_description: true } },
+                    fournisseur: { select: { nom_societe: true } },
+                },
         });
 
         if (!user) {
@@ -77,6 +79,8 @@ export async function GET(
                 : `${user.prenom} ${user.nom}`,
             role: role,
             description: user.couturier?.bio_description || "",
+            adresse_postale: user.adresse_postale || null,
+            ville: user.ville || null,
             posts: posts,
         };
 

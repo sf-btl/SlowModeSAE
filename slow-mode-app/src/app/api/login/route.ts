@@ -54,13 +54,15 @@ export async function POST(request: Request) {
     else if (user.couturier) accountType = 'couturier';
     else if (user.fournisseur) accountType = 'fournisseur';
 
-    // Créer le token JWT
+    // Créer le token JWT (inclure adresse_postale et ville pour garder la localite)
     const token = await createToken({
       userId: user.id,
       email: user.email,
       nom: user.nom,
       prenom: user.prenom,
-      accountType
+      accountType,
+      adresse_postale: user.adresse_postale || null,
+      ville: user.ville || null,
     });
   
     // Définir le cookie

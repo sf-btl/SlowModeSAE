@@ -107,7 +107,13 @@ export default function PublicProfilPage({ params }: { params: Promise<{ id: str
 
           <div className="mt-3 flex items-center justify-center gap-2 text-sm text-zinc-600">
             <MapPin className="h-4 w-4" />
-            <span>Localite non renseignee</span>
+            <span>
+              {profile.ville && profile.ville.trim() !== ""
+                ? profile.ville
+                : profile.adresse_postale && profile.adresse_postale.trim() !== ""
+                ? profile.adresse_postale
+                : "Localite non renseignee"}
+            </span>
           </div>
 
           {profile.description && (

@@ -77,9 +77,33 @@ export async function removeAuthCookie() {
 export async function getCurrentUser(): Promise<JWTPayload | null> {
   const token = await getAuthToken();
   if (!token) return null;
-  const payload = await verifyToken(token);
-  if (!payload) return null;
-  return verifyToken(token);
-  // Récupère l'utilisateur à jour depuis la base
+
+  const decoded = await verifyToken(token);
+  if (!decoded) return null;
+
+  try {
+    const user = await prisma.utilisateur.findUnique({
+      where: { id: decoded.userId },
+      include: { acheteur: true, couturier: true, fournisseur: true },
+    });
+
+    if (!user) return null;
+
+    const accountType = user.couturier ? 'couturier' : user.fournisseur ? 'fournisseur' : 'acheteur';
+
+    return {
+      userId: user.id,
+      email: user.email,
+      accountType,
+      nom: user.nom,
+      prenom: user.prenom,
+      adresse_postale: user.adresse_postale || null,
+      ville: user.ville || null,
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'utilisateur depuis la BDD:', error);
+    // Fallback: return decoded token payload if DB lookup fails
+    return decoded;
+  }
 
 }
