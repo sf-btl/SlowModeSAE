@@ -33,10 +33,11 @@ export default function Input({
   minLength,
   name
 }: InputProps) {
-  const baseClasses = "w-full pl-3 py-2 text-black font-montserrat bg-input-bg border-0 rounded-md focus:outline-none focus:ring-2 transition-colors"
-  const errorClasses = error 
-    ? "focus:ring-rose-800/80 ring-1 ring-rose-800" 
-    : "focus:ring-zinc-500"
+  const baseClasses =
+    "w-full rounded-2xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 font-montserrat focus:outline-none focus:ring-2 transition-colors"
+  const errorClasses = error
+    ? "focus:ring-rose-500/60 ring-1 ring-rose-500"
+    : "focus:ring-cyan-900/20"
   const iconPadding = icon ? "pr-10" : "pr-3"
 
   return (
@@ -48,7 +49,7 @@ export default function Input({
       )}
       <input
         id={id}
-        name={name}
+        name={name ?? id}
         type={type}
         required={required}
         disabled={disabled}

@@ -1,9 +1,9 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Heart, ShoppingCart, Search, Home, User, Package } from 'lucide-react';
+"use client";
 
-// Types basés sur votre schéma Prisma
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, Heart, Package } from "lucide-react";
+
 interface Tissu {
   id: number;
   matiere: string;
@@ -24,6 +24,7 @@ interface Tissu {
 interface Product {
   id: number;
   nom_produit: string;
+  categorie: string;
   description: string | null;
   imagePath: string | null;
   prix_unitaire: number;
@@ -37,43 +38,68 @@ interface Product {
   };
 }
 
-// Fonction pour détecter la catégorie depuis le nom du produit
-const detectCategory = (nomProduit: string): string => {
-  const nom = nomProduit.toLowerCase();
-  if (nom.includes('pantalon')) return 'Pantalon';
-  if (nom.includes('chemise')) return 'Chemise';
-  if (nom.includes('robe')) return 'Robe';
-  if (nom.includes('veste')) return 'Veste';
-  return 'Produit';
+const categories = [
+  { label: "Tout", value: "ALL" },
+  { label: "Pantalon", value: "PANTALON" },
+  { label: "Chemise", value: "CHEMISE" },
+  { label: "Robe", value: "ROBE" },
+  { label: "Veste", value: "VESTE" },
+  { label: "Pull", value: "PULL" },
+  { label: "T-shirt", value: "T_SHIRT" },
+  { label: "Jupe", value: "JUPE" },
+  { label: "Manteau", value: "MANTEAU" },
+  { label: "Combinaison", value: "COMBINAISON" },
+  { label: "Accessoire", value: "ACCESSOIRE" },
+  { label: "Autre", value: "AUTRE" },
+];
+
+const categoryLabelFromValue = (value: string) => {
+  const match = categories.find((item) => item.value === value);
+  return match ? match.label : "Produit";
 };
+
+const formatPriceEUR = (value: number) =>
+  new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+  }).format(value);
 
 export default function FeedPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const selectionMode = searchParams.get('selection') === '1';
-  const categoryParam = searchParams.get('category');
-  const [activeTab, setActiveTab] = useState<'patrons' | 'tissus'>(
-    selectionMode ? 'tissus' : 'patrons'
+  const selectionMode = searchParams.get("selection") === "1";
+  const categoryParam = searchParams.get("category");
+  const [activeTab, setActiveTab] = useState<"patrons" | "tissus">(
+    selectionMode ? "tissus" : "patrons"
   );
   const [products, setProducts] = useState<Product[]>([]);
   const [tissus, setTissus] = useState<Tissu[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Tout');
+  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const categories = ['Tout', 'Pantalon', 'Chemise', 'Robe', 'Veste'];
 
   useEffect(() => {
     if (selectionMode) {
-      setActiveTab('tissus');
-      setSelectedCategory('Tout');
+      setActiveTab("tissus");
+      setSelectedCategory(categories[0]);
       setIsDropdownOpen(false);
     }
   }, [selectionMode]);
 
   useEffect(() => {
-    if (activeTab === 'patrons') {
+    if (!selectionMode && categoryParam) {
+      const normalizedParam = categoryParam.toUpperCase();
+      const match = categories.find((item) => item.value === normalizedParam);
+      if (match) {
+        setSelectedCategory(match);
+      }
+    }
+  }, [categoryParam, selectionMode]);
+
+  useEffect(() => {
+    if (activeTab === "patrons") {
       fetchProducts();
     } else {
       fetchTissus();
@@ -83,26 +109,25 @@ export default function FeedPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/products/feed');
+      const response = await fetch("/api/products/feed");
       const data = await response.json();
 
       if (data.success) {
         let filteredProducts = data.products;
-        
-        if (selectedCategory !== 'Tout') {
-          filteredProducts = data.products.filter((product: Product) => {
-            const detectedCategory = detectCategory(product.nom_produit);
-            return detectedCategory === selectedCategory;
-          });
+
+        if (selectedCategory.value !== "ALL") {
+          filteredProducts = data.products.filter(
+            (product: Product) => product.categorie === selectedCategory.value
+          );
         }
-        
+
         setProducts(filteredProducts);
       } else {
-        setError(data.message || 'Erreur lors du chargement des produits');
+        setError(data.message || "Erreur lors du chargement des produits");
       }
     } catch (err) {
-      console.error('Erreur:', err);
-      setError('Impossible de charger les produits');
+      console.error("Erreur:", err);
+      setError("Impossible de charger les produits");
     } finally {
       setLoading(false);
     }
@@ -111,24 +136,20 @@ export default function FeedPage() {
   const fetchTissus = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/tissus/feed');
+      const response = await fetch("/api/tissus/feed");
       const data = await response.json();
 
       if (data.success) {
         setTissus(data.tissus);
       } else {
-        setError(data.message || 'Erreur lors du chargement des tissus');
+        setError(data.message || "Erreur lors du chargement des tissus");
       }
     } catch (err) {
-      console.error('Erreur:', err);
-      setError('Impossible de charger les tissus');
+      console.error("Erreur:", err);
+      setError("Impossible de charger les tissus");
     } finally {
       setLoading(false);
     }
-  };
-
-  const getCreatorInitials = (prenom: string, nom: string) => {
-    return `${prenom.charAt(0)}${nom.charAt(0)}`.toUpperCase();
   };
 
   if (loading) {
@@ -136,7 +157,7 @@ export default function FeedPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-4 border-cyan-950 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600 font-montserrat">Chargement...</p>
+          <p className="text-zinc-600 font-montserrat">Chargement...</p>
         </div>
       </div>
     );
@@ -146,12 +167,12 @@ export default function FeedPage() {
     return (
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="text-center">
-          <p className="text-red-600 font-montserrat mb-4">{error}</p>
+          <p className="text-rose-600 font-montserrat mb-4">{error}</p>
           <button
-            onClick={() => activeTab === 'patrons' ? fetchProducts() : fetchTissus()}
+            onClick={() => (activeTab === "patrons" ? fetchProducts() : fetchTissus())}
             className="bg-cyan-950 text-white px-6 py-2 rounded-xl font-montserrat"
           >
-            Réessayer
+            Reessayer
           </button>
         </div>
       </div>
@@ -159,61 +180,49 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 z-20">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          {selectionMode ? (
-            <>
-              <button
-                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700"
-                onClick={() => router.push('/nouveau-projet/tissu')}
-              >
-                <ArrowLeft size={18} />
-                Retour
-              </button>
-              <h1 className="text-lg font-semibold text-gray-900 font-lusitana">
-                Choisir un tissu
-              </h1>
-              <span className="w-10" aria-hidden="true" />
-            </>
-          ) : (
-            <>
-              <h1 className="text-2xl font-bold text-gray-900 font-lusitana">SlowMode</h1>
-              <div className="flex items-center gap-3">
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <Heart size={24} className="text-gray-700" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <Search size={24} className="text-gray-700" />
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </header>
+    <div className="space-y-8">
+      <div className="flex flex-col gap-2">
+        {selectionMode ? (
+          <button
+            className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-600"
+            onClick={() => router.push("/nouveau-projet/tissu")}
+          >
+            <ArrowLeft size={18} />
+            Retour
+          </button>
+        ) : (
+          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Marketplace</p>
+        )}
+        <h1 className="text-3xl font-lusitana text-cyan-950">
+          {selectionMode ? "Choisir un tissu" : "Marketplace"}
+        </h1>
+        {!selectionMode && (
+          <p className="text-sm text-zinc-600">
+            Parcourez les patrons et les tissus pour vos projets responsables.
+          </p>
+        )}
+      </div>
 
-      {/* Tabs Patrons / Tissus */}
       {!selectionMode && (
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex gap-2 bg-white">
+        <div className="max-w-5xl mx-auto px-4 py-4">
+          <div className="flex gap-2 bg-white rounded-2xl border border-zinc-100 p-2">
             <button
-              onClick={() => setActiveTab('patrons')}
-              className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
-                activeTab === 'patrons'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'bg-transparent text-gray-700 hover:bg-gray-50'
+              onClick={() => setActiveTab("patrons")}
+              className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm transition-all font-montserrat flex-1 ${
+                activeTab === "patrons"
+                  ? "bg-cyan-950 text-white"
+                  : "bg-transparent text-zinc-600 hover:bg-zinc-50"
               }`}
             >
               <Package size={18} />
               Patrons
             </button>
             <button
-              onClick={() => setActiveTab('tissus')}
-              className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-semibold text-sm transition-all font-montserrat flex-1 ${
-                activeTab === 'tissus'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'bg-transparent text-gray-700 hover:bg-gray-50'
+              onClick={() => setActiveTab("tissus")}
+              className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm transition-all font-montserrat flex-1 ${
+                activeTab === "tissus"
+                  ? "bg-cyan-950 text-white"
+                  : "bg-transparent text-zinc-600 hover:bg-zinc-50"
               }`}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -226,19 +235,18 @@ export default function FeedPage() {
         </div>
       )}
 
-      {/* Filtre de catégories - Seulement pour Patrons */}
-      {activeTab === 'patrons' && !selectionMode && (
-        <div className="max-w-4xl mx-auto px-4 pb-4">
+      {activeTab === "patrons" && !selectionMode && (
+        <div className="max-w-5xl mx-auto px-4 pb-4">
           <div className="relative">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full max-w-xs bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-left flex items-center justify-between hover:border-gray-400 transition-colors"
+              className="w-full max-w-xs bg-white border border-zinc-200 rounded-xl px-4 py-2.5 text-left flex items-center justify-between hover:border-cyan-950 transition-colors"
             >
-              <span className="text-gray-900 font-montserrat">{selectedCategory}</span>
-              <svg 
-                className={`w-5 h-5 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                fill="none" 
-                stroke="currentColor" 
+              <span className="text-zinc-900 font-montserrat">{selectedCategory.label}</span>
+              <svg
+                className={`w-5 h-5 text-zinc-500 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -247,26 +255,22 @@ export default function FeedPage() {
 
             {isDropdownOpen && (
               <>
-                <div 
-                  className="fixed inset-0 z-10" 
-                  onClick={() => setIsDropdownOpen(false)}
-                />
-                
-                <div className="absolute top-full left-0 mt-1 w-full max-w-xs bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)} />
+                <div className="absolute top-full left-0 mt-1 w-full max-w-xs bg-white border border-zinc-200 rounded-xl shadow-lg z-20 overflow-hidden">
                   {categories.map((category) => (
                     <button
-                      key={category}
+                      key={category.value}
                       onClick={() => {
                         setSelectedCategory(category);
                         setIsDropdownOpen(false);
                       }}
                       className={`w-full text-left px-4 py-2.5 font-montserrat transition-colors ${
-                        selectedCategory === category
-                          ? 'bg-gray-100 text-gray-900 font-semibold'
-                          : 'text-gray-700 hover:bg-gray-50'
+                        selectedCategory.value === category.value
+                          ? "bg-zinc-100 text-zinc-900 font-semibold"
+                          : "text-zinc-700 hover:bg-zinc-50"
                       }`}
                     >
-                      {category}
+                      {category.label}
                     </button>
                   ))}
                 </div>
@@ -276,201 +280,121 @@ export default function FeedPage() {
         </div>
       )}
 
-      {/* Feed Patrons */}
-      {activeTab === 'patrons' && !selectionMode && (
-        <div className="max-w-4xl mx-auto">
+      {activeTab === "patrons" && !selectionMode && (
+        <div className="max-w-5xl mx-auto px-4">
           {products.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 font-montserrat">Aucun produit disponible</p>
+              <p className="text-zinc-500 font-montserrat">Aucun produit disponible</p>
             </div>
           ) : (
-            products.map((product) => (
-              <article key={product.id} className="bg-white mb-6">
-                <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 mx-4">
-                  <div 
-                    className="relative w-full aspect-[4/5] bg-gray-50 cursor-pointer overflow-hidden"
-                    onClick={() => window.location.href = `/produit/${product.id}`}
-                  >
-                    <button 
-                      className="absolute top-3 right-3 z-10 bg-white rounded-full p-2 shadow-md hover:scale-110 transition-transform"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {products.map((product) => {
+                const creatorName = `${product.couturier.utilisateur.prenom} ${product.couturier.utilisateur.nom}`.trim();
+                const stockLabel =
+                  product.stock === 0
+                    ? "Rupture de stock"
+                    : product.stock < 5
+                    ? `Plus que ${product.stock} !`
+                    : "Disponible";
+                return (
+                  <article key={product.id} className="group">
+                    <div
+                      className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-zinc-100 shadow-sm"
+                      onClick={() => (window.location.href = `/produit/${product.id}`)}
+                      role="button"
+                      tabIndex={0}
                     >
-                      <Heart size={20} className="text-gray-700" />
-                    </button>
-
-                    {product.imagePath ? (
-                      <img
-                        src={product.imagePath}
-                        alt={product.nom_produit}
-                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <span className="font-montserrat">Pas d'image</span>
-                      </div>
-                    )}
-
-                    {product.stock < 5 && product.stock > 0 && (
-                      <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        Plus que {product.stock} !
-                      </div>
-                    )}
-                    {product.stock === 0 && (
-                      <div className="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        Rupture de stock
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-4">
-                    <p className="text-xs text-gray-500 font-montserrat mb-1">
-                      {detectCategory(product.nom_produit)}
-                    </p>
-
-                    <div className="flex items-start justify-between mb-3">
-                      <h2 
-                        className="text-xl font-bold text-gray-900 font-lusitana cursor-pointer hover:text-cyan-950 transition-colors flex-1"
-                        onClick={() => window.location.href = `/produit/${product.id}`}
-                      >
-                        {product.nom_produit}
-                      </h2>
-                      <div className="text-xl font-bold text-gray-900 font-lusitana ml-3">
-                        {product.prix_unitaire.toFixed(2)} €
+                      {product.imagePath ? (
+                        <img
+                          src={product.imagePath}
+                          alt={product.nom_produit}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-zinc-400">
+                          <span className="font-montserrat text-sm">Pas d'image</span>
+                        </div>
+                      )}
+                      <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-xs text-zinc-700 shadow">
+                        <Heart size={14} />
+                        <span>{Math.max(product.stock, 0)}</span>
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => window.location.href = `/produit/${product.id}`}
-                      className={`w-full py-3 rounded-xl font-semibold text-sm transition-all font-montserrat ${
-                        product.stock > 0
-                          ? 'bg-black text-white hover:bg-gray-800'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
-                      disabled={product.stock === 0}
-                    >
-                      {product.stock > 0 ? 'Sélectionner' : 'Indisponible'}
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))
+                    <div className="mt-3 space-y-1">
+                      <p className="text-xs text-zinc-500 font-montserrat">
+                        {creatorName || "Atelier SlowMode"}
+                      </p>
+                      <p className="text-xs text-zinc-400 font-montserrat">{stockLabel}</p>
+                      <p className="text-xs text-zinc-400 font-montserrat">
+                        {categoryLabelFromValue(product.categorie)}
+                      </p>
+                      <h3 className="text-sm font-semibold text-zinc-900 font-montserrat truncate">
+                        {product.nom_produit}
+                      </h3>
+                      <p className="text-sm font-semibold text-cyan-950">
+                        {formatPriceEUR(product.prix_unitaire)}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           )}
         </div>
       )}
 
-      {/* Feed Tissus */}
-      {activeTab === 'tissus' && (
-        <div className="max-w-4xl mx-auto">
+      {activeTab === "tissus" && (
+        <div className="max-w-5xl mx-auto px-4">
           {tissus.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 font-montserrat">Aucun tissu disponible</p>
+              <p className="text-zinc-500 font-montserrat">Aucun tissu disponible</p>
             </div>
           ) : (
-            tissus.map((tissu) => (
-              <article key={tissu.id} className="bg-white mb-6">
-                <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 mx-4">
-                  <div 
-                    className="relative w-full aspect-[4/5] bg-gray-50 cursor-pointer overflow-hidden"
-                    onClick={() =>
-                      (window.location.href = selectionMode
-                        ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
-                        : `/tissu/${tissu.id}`)
-                    }
-                  >
-                    <img
-                      src={tissu.imagePath}
-                      alt={tissu.matiere}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                    />
-
-                    {tissu.metrage_dispo < 10 && tissu.metrage_dispo > 0 && (
-                      <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        Plus que {tissu.metrage_dispo}m !
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-5">
-                    {/* Matière et Prix */}
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm text-gray-600 font-montserrat">
-                        {tissu.matiere}
-                      </p>
-                      <div className="text-2xl font-bold text-orange-500 font-lusitana">
-                        {tissu.prix_unitaire.toFixed(0)}€/m
-                      </div>
-                    </div>
-
-                    {/* Titre */}
-                    <h2 
-                      className="text-xl font-bold text-gray-900 font-lusitana mb-1 cursor-pointer hover:text-cyan-950 transition-colors"
-                      onClick={() =>
-                        (window.location.href = selectionMode
-                          ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
-                          : `/tissu/${tissu.id}`)
-                      }
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {tissus.map((tissu) => {
+                const tissuHref = selectionMode
+                  ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ""}`
+                  : `/tissu/${tissu.id}`;
+                const metrageLabel =
+                  tissu.metrage_dispo < 10 && tissu.metrage_dispo > 0
+                    ? `Plus que ${tissu.metrage_dispo}m`
+                    : "Disponible";
+                return (
+                  <article key={tissu.id} className="group">
+                    <div
+                      className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-zinc-100 shadow-sm"
+                      onClick={() => (window.location.href = tissuHref)}
+                      role="button"
+                      tabIndex={0}
                     >
-                      {tissu.matiere} {tissu.couleur}
-                    </h2>
-
-                    {/* Fournisseur */}
-                    <p className="text-sm text-gray-600 font-montserrat mb-4">
-                      par {tissu.fournisseur.nom_societe}
-                    </p>
-
-                    {/* Pastilles de couleur */}
-                    <div className="flex gap-2 mb-4">
-                      <div 
-                        className="w-8 h-8 rounded-full border-2 border-gray-300"
-                        style={{ backgroundColor: tissu.couleur.toLowerCase() }}
-                        title={tissu.couleur}
+                      <img
+                        src={tissu.imagePath}
+                        alt={`${tissu.matiere} ${tissu.couleur}`}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                      {/* Vous pouvez ajouter d'autres variations de couleur ici */}
+                      <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-xs text-zinc-700 shadow">
+                        <Heart size={14} />
+                        <span>{Math.max(Math.round(tissu.metrage_dispo), 0)}</span>
+                      </div>
                     </div>
 
-                    {/* Bouton */}
-                    <button
-                      onClick={() =>
-                        (window.location.href = selectionMode
-                          ? `/tissu/${tissu.id}?selection=1${categoryParam ? `&category=${categoryParam}` : ''}`
-                          : `/tissu/${tissu.id}`)
-                      }
-                      className="w-full py-3 rounded-xl font-semibold text-sm transition-all font-montserrat bg-black text-white hover:bg-gray-800"
-                    >
-                      Sélectionner
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))
+                    <div className="mt-3 space-y-1">
+                      <p className="text-xs text-zinc-500 font-montserrat">{tissu.fournisseur.nom_societe}</p>
+                      <p className="text-xs text-zinc-400 font-montserrat">{metrageLabel}</p>
+                      <h3 className="text-sm font-semibold text-zinc-900 font-montserrat truncate">
+                        {tissu.matiere} {tissu.couleur}
+                      </h3>
+                      <p className="text-sm font-semibold text-cyan-950">
+                        {formatPriceEUR(tissu.prix_unitaire)} / m
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           )}
         </div>
-      )}
-
-      {/* Bottom Navigation */}
-      {!selectionMode && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-creatorcolor border-t border-gray-700 shadow-lg z-50">
-          <div className="flex justify-around items-center h-16 max-w-xl mx-auto">
-            <button className="flex flex-col items-center justify-center p-2 text-yellow-100 font-semibold">
-              <Home size={24} className="mb-0.5" />
-              <span className="text-xs font-medium font-montserrat">Accueil</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
-              <Search size={24} className="mb-0.5" />
-              <span className="text-xs font-medium font-montserrat">Tissus</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
-              <ShoppingCart size={24} className="mb-0.5" />
-              <span className="text-xs font-medium font-montserrat">Panier</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-yellow-100 transition-colors">
-              <User size={24} className="mb-0.5" />
-              <span className="text-xs font-medium font-montserrat">Profil</span>
-            </button>
-          </div>
-        </nav>
       )}
     </div>
   );

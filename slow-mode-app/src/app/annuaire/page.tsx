@@ -2,14 +2,13 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 type SortOption = "pertinence" | "distance" | "note";
 
 type DirectoryEntry = {
   id: string;
   name: string;
-  role: "Créateur" | "Fournisseur";
+  role: "Createur" | "Fournisseur";
   rating: number;
   locationHint?: string;
   originalIndex: number;
@@ -105,11 +104,18 @@ export default function AnnuairePage() {
   }, [filteredEntries, sortOption]);
 
   return (
-    <div className="min-h-screen bg-[#f2f2f2] font-inter">
-      <div className="mx-auto flex w-full max-w-md flex-col px-4 pb-24 pt-6 sm:max-w-lg">
-        <div className="flex items-center gap-3">
-          <div className="flex flex-1 items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm">
-            <span className="text-[#3c2a5d]" aria-hidden="true">
+    <div className="space-y-8 font-montserrat text-zinc-900">
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Annuaire</p>
+        <h1 className="mt-3 text-3xl font-lusitana text-cyan-950">
+          Trouver un artisan ou un fournisseur
+        </h1>
+      </div>
+
+      <div className="space-y-4 rounded-3xl border border-zinc-100 bg-white/80 p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex flex-1 items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2">
+            <span className="text-zinc-400" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"
@@ -128,13 +134,13 @@ export default function AnnuairePage() {
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Rechercher"
-              className="w-full bg-transparent text-sm text-[#3c2a5d] placeholder:text-[#a39ab5] focus:outline-none"
+              className="w-full bg-transparent text-sm text-zinc-700 placeholder:text-zinc-400 focus:outline-none"
               type="search"
             />
           </div>
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d3d0da] bg-white text-[#3c2a5d] shadow-sm"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-zinc-200 bg-white text-zinc-500"
             aria-disabled="true"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -151,27 +157,27 @@ export default function AnnuairePage() {
           </button>
         </div>
 
-        <div className="mt-4 flex rounded-full bg-[#d8d5dd] p-1 text-sm font-semibold text-[#3c2a5d]">
+        <div className="flex rounded-full bg-zinc-100 p-1 text-sm font-semibold text-zinc-600">
           <button
             type="button"
-            className="flex-1 rounded-full bg-[#3c2a5d] px-4 py-2 text-white"
+            className="flex-1 rounded-full bg-cyan-950 px-4 py-2 text-white"
           >
             Liste
           </button>
           <button
             type="button"
-            className="flex-1 rounded-full px-4 py-2 text-[#3c2a5d]"
+            className="flex-1 rounded-full px-4 py-2 text-zinc-600"
             aria-disabled="true"
           >
             Carte
           </button>
         </div>
 
-        <div className="mt-5 flex items-center gap-2 text-sm text-[#5c546a]">
+        <div className="flex items-center gap-2 text-sm text-zinc-500">
           <span className="font-medium">Trier par :</span>
           <button
             type="button"
-            className="flex items-center gap-1 font-semibold text-[#3c2a5d]"
+            className="flex items-center gap-1 font-semibold text-cyan-950"
             onClick={() => setIsSortOpen(true)}
           >
             {SORT_LABELS[sortOption]}
@@ -186,114 +192,101 @@ export default function AnnuairePage() {
             </svg>
           </button>
         </div>
+      </div>
 
-        <div className="mt-4 flex flex-col gap-4">
-          {errorMessage ? (
-            <div className="rounded-2xl bg-white px-4 py-6 text-center text-sm text-[#7a7286] shadow-sm">
-              {errorMessage}
-            </div>
-          ) : null}
-          {isLoading ? (
-            <div className="rounded-2xl bg-white px-4 py-6 text-center text-sm text-[#7a7286] shadow-sm">
-              Chargement de l'annuaire...
-            </div>
-          ) : null}
-          {sortedEntries.map((entry) => {
-            const isCreator = entry.role === "Créateur";
-            const roleTextColor = isCreator ? "text-[#283618]" : "text-[#03045E]";
-            const roleBadgeColor = isCreator ? "bg-[#283618]" : "bg-[#03045E]";
+      <div className="grid gap-4">
+        {errorMessage ? (
+          <div className="rounded-2xl bg-white px-4 py-6 text-center text-sm text-zinc-500 shadow-sm">
+            {errorMessage}
+          </div>
+        ) : null}
+        {isLoading ? (
+          <div className="rounded-2xl bg-white px-4 py-6 text-center text-sm text-zinc-500 shadow-sm">
+            Chargement de l'annuaire...
+          </div>
+        ) : null}
+        {sortedEntries.map((entry) => {
+          const isCreator = entry.role === "Createur";
+          const roleTextColor = isCreator ? "text-cyan-950" : "text-emerald-700";
+          const roleBadgeColor = isCreator ? "bg-cyan-950" : "bg-emerald-700";
 
-            return (
-              <Link
-                href={`/profil/${entry.id}`}
-                key={`${entry.id}-${entry.role}`}
-                className="flex items-center gap-4 rounded-2xl bg-white px-4 py-3 shadow-sm transition hover:bg-gray-50"
+          return (
+            <Link
+              href={`/profil/${entry.id}`}
+              key={`${entry.id}-${entry.role}`}
+              className="flex items-center gap-4 rounded-3xl border border-zinc-100 bg-white/80 px-5 py-4 shadow-sm transition hover:border-cyan-950"
+            >
+              <div
+                className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold font-lusitana text-white shadow ${roleBadgeColor}`}
               >
-                <div
-                  className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold font-lusitana text-white shadow ${roleBadgeColor}`}
-                >
-                  {getInitials(entry.name)}
+                {getInitials(entry.name)}
+              </div>
+              <div className="flex flex-1 flex-col gap-1 text-zinc-900">
+                <div className="text-sm font-bold font-lusitana">{entry.name}</div>
+                <div className={`text-xs font-semibold ${roleTextColor}`}>{entry.role}</div>
+                <div className="flex items-center gap-2 text-xs text-zinc-600">
+                  <span className="inline-flex items-center gap-1 font-semibold text-zinc-900">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="m12 3 2.7 5.5 6.1.9-4.4 4.2 1 6.1L12 17l-5.4 2.7 1-6.1-4.4-4.2 6.1-.9L12 3Z"
+                        fill="#f59e0b"
+                      />
+                    </svg>
+                    {entry.rating}
+                  </span>
+                  <span className="font-semibold">{formatDistancePlaceholder()}</span>
                 </div>
-                <div className="flex flex-1 flex-col gap-1 text-[#1f1c24]">
-                  <div className="text-sm font-bold font-lusitana">
-                    {entry.name}
-                  </div>
-                  <div className={`text-xs font-semibold ${roleTextColor}`}>
-                    {entry.role}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-[#1f1c24]">
-                    <span className="inline-flex items-center gap-1 font-semibold text-[#1f1c24]">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="m12 3 2.7 5.5 6.1.9-4.4 4.2 1 6.1L12 17l-5.4 2.7 1-6.1-4.4-4.2 6.1-.9L12 3Z"
-                          fill="#2cb34a"
-                        />
-                      </svg>
-                      {entry.rating}
-                    </span>
-                    <span className="font-semibold">
-                      {formatDistancePlaceholder()}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-          {!isLoading && !errorMessage && sortedEntries.length === 0 ? (
-            <div className="rounded-2xl bg-white px-4 py-6 text-center text-sm text-[#7a7286] shadow-sm">
-              Aucun profil ne correspond à votre recherche.
-            </div>
-          ) : null}
-        </div>
+              </div>
+            </Link>
+          );
+        })}
+        {!isLoading && !errorMessage && sortedEntries.length === 0 ? (
+          <div className="rounded-2xl bg-white px-4 py-6 text-center text-sm text-zinc-500 shadow-sm">
+            Aucun profil ne correspond a votre recherche.
+          </div>
+        ) : null}
       </div>
 
       {isSortOpen ? (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center pb-16">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center pb-12">
           <button
             type="button"
             className="fixed inset-0 bg-black/50"
             onClick={() => setIsSortOpen(false)}
             aria-label="Fermer la fenetre de tri"
           />
-          <div className="relative w-full max-w-md rounded-t-3xl bg-white px-6 pb-8 pt-5 shadow-xl sm:max-w-lg">
+          <div className="relative w-full max-w-md rounded-t-3xl bg-white px-6 pb-8 pt-5 shadow-xl">
             <div className="flex justify-center">
-              <span className="h-1 w-12 rounded-full bg-[#dedbe3]" />
+              <span className="h-1 w-12 rounded-full bg-zinc-200" />
             </div>
-            <h2 className="mt-4 text-center text-lg font-semibold text-[#1f1c24]">
-              Trier par:
-            </h2>
+            <h2 className="mt-4 text-center text-lg font-semibold text-zinc-900">Trier par:</h2>
             <div className="mt-6 flex flex-col gap-4 text-sm">
-              {(["pertinence", "distance", "note"] as SortOption[]).map(
-                (option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    className="flex items-center justify-between text-left font-semibold text-[#3c2a5d]"
-                    onClick={() => {
-                      setSortOption(option);
-                      setIsSortOpen(false);
-                    }}
+              {(["pertinence", "distance", "note"] as SortOption[]).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className="flex items-center justify-between text-left font-semibold text-zinc-700"
+                  onClick={() => {
+                    setSortOption(option);
+                    setIsSortOpen(false);
+                  }}
+                >
+                  <span>{SORT_LABELS[option]}</span>
+                  <span
+                    className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                      sortOption === option ? "border-cyan-950" : "border-zinc-200"
+                    }`}
                   >
-                    <span>{SORT_LABELS[option]}</span>
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${sortOption === option
-                        ? "border-[#3c2a5d]"
-                        : "border-[#d7d3db]"
-                        }`}
-                    >
-                      {sortOption === option ? (
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#3c2a5d]" />
-                      ) : null}
-                    </span>
-                  </button>
-                )
-              )}
+                    {sortOption === option ? (
+                      <span className="h-2.5 w-2.5 rounded-full bg-cyan-950" />
+                    ) : null}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
       ) : null}
-
-      <BottomNavClientWrapper />
     </div>
   );
 }

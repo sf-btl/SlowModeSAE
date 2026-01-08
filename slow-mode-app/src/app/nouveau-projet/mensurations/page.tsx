@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 type Field = {
   id: string;
@@ -14,7 +13,7 @@ const CATEGORY_FIELDS: Record<string, Field[]> = {
     { id: "taille", label: "Taille (hauteur totale) (cm)" },
     { id: "poitrine", label: "Tour de poitrine (cm)" },
     { id: "tailleTour", label: "Tour de taille (cm)" },
-    { id: "epaules", label: "Largeur d'épaules (cm)" },
+    { id: "epaules", label: "Largeur d'epaules (cm)" },
     { id: "bras", label: "Longueur de bras (cm)" },
   ],
   bottoms: [
@@ -28,12 +27,12 @@ const CATEGORY_FIELDS: Record<string, Field[]> = {
     { id: "poitrine", label: "Tour de poitrine (cm)" },
     { id: "tailleTour", label: "Tour de taille (cm)" },
     { id: "hanches", label: "Tour de hanches (cm)" },
-    { id: "epauleTaille", label: "Longueur épaule-taille (cm)" },
+    { id: "epauleTaille", label: "Longueur epaule-taille (cm)" },
   ],
   outerwear: [
     { id: "taille", label: "Taille (hauteur totale) (cm)" },
     { id: "poitrine", label: "Tour de poitrine (avec aisance) (cm)" },
-    { id: "epaules", label: "Largeur d'épaules (cm)" },
+    { id: "epaules", label: "Largeur d'epaules (cm)" },
     { id: "biceps", label: "Tour de bras (biceps) (cm)" },
   ],
   lingerie: [
@@ -42,7 +41,7 @@ const CATEGORY_FIELDS: Record<string, Field[]> = {
     { id: "bassin", label: "Tour de bassin (cm)" },
   ],
   accessories: [
-    { id: "tete", label: "Tour de tête (bonnets/bandeaux) (cm)" },
+    { id: "tete", label: "Tour de tete (bonnets/bandeaux) (cm)" },
     { id: "tailleTour", label: "Tour de taille (ceintures) (cm)" },
   ],
 };
@@ -55,40 +54,36 @@ export default function MensurationsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const fields = useMemo(
-    () => CATEGORY_FIELDS[category] ?? CATEGORY_FIELDS.tops,
-    [category]
-  );
+  const fields = useMemo(() => CATEGORY_FIELDS[category] ?? CATEGORY_FIELDS.tops, [category]);
 
   return (
-    <div className="min-h-screen bg-[#f3f1f6] font-montserrat text-[#1e1b24]">
-      <div className="mx-auto flex w-full max-w-md flex-col px-6 pb-24 pt-8">
-        <div className="text-xs font-semibold uppercase tracking-wide text-[#3c2a5d]">
+    <div className="space-y-8 font-montserrat text-zinc-900">
+      <div className="rounded-3xl border border-zinc-100 bg-white/80 p-6 shadow-sm">
+        <div className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500">
           Etape 5 sur 5
         </div>
-        <div className="mt-2 h-2 w-full rounded-full bg-[#dcd7e3]">
-          <div className="h-full w-full rounded-full bg-[#3c2a5d]" />
+        <div className="mt-3 h-2 w-full rounded-full bg-zinc-200">
+          <div className="h-full w-full rounded-full bg-cyan-950" />
         </div>
 
         <div className="mt-6">
-          <h1 className="text-3xl font-semibold text-[#1e1b24]">
+          <h1 className="text-3xl font-lusitana text-cyan-950">
             Soumettre vos mensurations
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-[#3a3640]">
-            Prenez un moment pour renseigner vos mesures actuelles. Un vêtement
-            parfaitement ajusté dure plus longtemps et réduit les retours
-            inutiles, participant ainsi à une mode plus durable et responsable.
+          <p className="mt-3 text-sm leading-relaxed text-zinc-600">
+            Prenez un moment pour renseigner vos mesures actuelles. Un vetement parfaitement
+            ajuste dure plus longtemps et reduit les retours inutiles.
           </p>
         </div>
 
         <div className="mt-6 space-y-4">
           {fields.map((field) => (
-            <label key={field.id} className="block text-sm text-[#3a3640]">
+            <label key={field.id} className="block text-sm text-zinc-700">
               {field.label}
               <input
                 type="number"
                 inputMode="decimal"
-                className="mt-2 w-full rounded-xl border border-[#d6d1dd] bg-white px-4 py-3 text-sm text-[#1e1b24] focus:outline-none focus:ring-2 focus:ring-[#3c2a5d]"
+                className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-cyan-900/20"
                 placeholder="0"
                 value={values[field.id] ?? ""}
                 onChange={(event) =>
@@ -106,7 +101,7 @@ export default function MensurationsPage() {
               const draft = JSON.parse(localStorage.getItem("projetDraft") || "{}");
               setErrorMessage(null);
               if (!draft.couturierId || !draft.mode) {
-                setErrorMessage("Merci de sélectionner un couturier et un type de projet.");
+                setErrorMessage("Merci de selectionner un couturier et un type de projet.");
                 return;
               }
               setIsSubmitting(true);
@@ -133,25 +128,19 @@ export default function MensurationsPage() {
                 router.push("/nouveau-projet/confirmation");
               } catch (error) {
                 console.error("Creation projet erreur:", error);
-                setErrorMessage("Erreur réseau lors de l'envoi.");
+                setErrorMessage("Erreur reseau lors de l'envoi.");
               } finally {
                 setIsSubmitting(false);
               }
             }}
-            className="w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f] disabled:opacity-60"
+            className="w-full rounded-full bg-cyan-950 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-900 disabled:opacity-60"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Envoi..." : "Soumettre mon projet"}
           </button>
-          {errorMessage && (
-            <p className="mt-3 text-center text-xs text-red-600">
-              {errorMessage}
-            </p>
-          )}
+          {errorMessage && <p className="mt-3 text-center text-xs text-rose-600">{errorMessage}</p>}
         </div>
       </div>
-
-      <BottomNavClientWrapper />
     </div>
   );
 }

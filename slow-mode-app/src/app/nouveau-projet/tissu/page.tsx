@@ -2,57 +2,44 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 export default function ChoisirTissuPage() {
   const searchParams = useSearchParams();
   const category = searchParams.get("category");
+
   return (
-    <div className="min-h-screen bg-[#f3f1f6] font-montserrat text-[#1e1b24]">
-      <div className="mx-auto flex w-full max-w-md flex-col px-6 pb-24 pt-8">
-        <div className="text-xs font-semibold uppercase tracking-wide text-[#3c2a5d]">
+    <div className="space-y-8 font-montserrat text-zinc-900">
+      <div className="rounded-3xl border border-zinc-100 bg-white/80 p-6 shadow-sm">
+        <div className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500">
           Etape 3 sur 5
         </div>
-        <div className="mt-2 h-2 w-full rounded-full bg-[#dcd7e3]">
-          <div className="h-full w-3/5 rounded-full bg-[#3c2a5d]" />
+        <div className="mt-3 h-2 w-full rounded-full bg-zinc-200">
+          <div className="h-full w-3/5 rounded-full bg-cyan-950" />
         </div>
 
         <div className="mt-6">
-          <h1 className="text-3xl font-semibold text-[#1e1b24]">
-            Choisir un tissu
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-[#3a3640]">
-            Sélectionnez la matière première de votre création. Choisissez
-            parmi les tissus disponibles sur la plateforme pour une expédition
-            directe chez votre couturier, ou indiquez que vous fournirez votre
-            propre tissu pour une personnalisation totale.
+          <h1 className="text-3xl font-lusitana text-cyan-950">Choisir un tissu</h1>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-600">
+            Selectionnez la matiere premiere de votre creation. Choisissez parmi les tissus
+            disponibles sur la plateforme pour une expedition directe chez votre couturier, ou
+            indiquez que vous fournirez votre propre tissu.
           </p>
         </div>
 
-        <div className="relative mt-10 flex h-56 items-center justify-center">
-          <img
-            src="/icons/fabric%20(1).png"
-            alt=""
-            className="h-44 w-auto max-w-xs"
-          />
-          <img
-            src="/icons/tape-measure.png"
-            alt=""
-            className="absolute -right-2 bottom-0 h-28 w-28"
-          />
+        <div className="relative mt-8 flex h-56 items-center justify-center">
+          <img src="/icons/fabric%20(1).png" alt="" className="h-44 w-auto max-w-xs" />
+          <img src="/icons/tape-measure.png" alt="" className="absolute -right-2 bottom-0 h-28 w-28" />
         </div>
 
-        <div className="mt-12">
+        <div className="mt-8">
           <Link
             href={`/marketplace?selection=1${category ? `&category=${category}` : ""}`}
-            className="block w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f]"
+            className="block w-full rounded-full bg-cyan-950 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-900"
           >
             Je choisis un tissu
           </Link>
         </div>
       </div>
-
-      <BottomNavClientWrapper />
     </div>
   );
 }
