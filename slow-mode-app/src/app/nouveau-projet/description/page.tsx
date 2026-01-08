@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
 
 export default function DescriptionProjetPage() {
   const searchParams = useSearchParams();
@@ -15,10 +14,7 @@ export default function DescriptionProjetPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const previews = useMemo(
-    () => files.map((file) => URL.createObjectURL(file)),
-    [files]
-  );
+  const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files]);
 
   useEffect(() => {
     return () => {
@@ -45,9 +41,7 @@ export default function DescriptionProjetPage() {
 
   const handleRemove = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
-    setActiveIndex((prev) =>
-      Math.min(prev, Math.max(0, previews.length - 2))
-    );
+    setActiveIndex((prev) => Math.min(prev, Math.max(0, previews.length - 2)));
   };
 
   const handleContinue = async () => {
@@ -64,15 +58,28 @@ export default function DescriptionProjetPage() {
           method: "POST",
           body: formData,
         });
-        const json = await res.json();
-        if (!json?.success) {
-          setErrorMessage("Impossible d'envoyer les images. Réessayez.");
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Upload images erreur:", errorText);
+          setErrorMessage("Impossible d'envoyer les images. Reessayez.");
+          return;
+        }
+        let json: { success?: boolean; paths?: string[] } | null = null;
+        try {
+          json = await res.json();
+        } catch (error) {
+          console.error("Upload images erreur:", error);
+          setErrorMessage("Reponse inattendue du serveur lors de l'upload.");
+          return;
+        }
+        if (!json?.success || !json.paths) {
+          setErrorMessage("Impossible d'envoyer les images. Reessayez.");
           return;
         }
         uploadedImages = json.paths;
       } catch (error) {
         console.error("Upload images erreur:", error);
-        setErrorMessage("Erreur réseau lors de l'upload.");
+        setErrorMessage("Erreur reseau lors de l'upload.");
         return;
       } finally {
         setIsUploading(false);
@@ -93,54 +100,39 @@ export default function DescriptionProjetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f1f6] font-montserrat text-[#1e1b24]">
-      <div className="mx-auto flex w-full max-w-md flex-col px-6 pb-24 pt-8">
-        <div className="text-xs font-semibold uppercase tracking-wide text-[#3c2a5d]">
+    <div className="space-y-8 font-montserrat text-zinc-900">
+      <div className="rounded-3xl border border-zinc-100 bg-white/80 p-6 shadow-sm">
+        <div className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500">
           Etape 4 sur 5
         </div>
-        <div className="mt-2 h-2 w-full rounded-full bg-[#dcd7e3]">
-          <div className="h-full w-4/5 rounded-full bg-[#3c2a5d]" />
+        <div className="mt-3 h-2 w-full rounded-full bg-zinc-200">
+          <div className="h-full w-4/5 rounded-full bg-cyan-950" />
         </div>
 
         <div className="mt-6">
-          <h1 className="text-3xl font-semibold text-[#1e1b24]">
-            Décrivez votre besoin
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-[#3a3640]">
-            Donnez un maximum de détails à votre couturier pour qu'il puisse
-            comprendre l'esprit de votre projet.
+          <h1 className="text-3xl font-lusitana text-cyan-950">Decrivez votre besoin</h1>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-600">
+            Donnez un maximum de details a votre couturier pour qu'il puisse comprendre l'esprit de
+            votre projet.
           </p>
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-4">
           <button
             type="button"
-            className="flex h-36 w-36 flex-col items-center justify-center gap-2 rounded-2xl border border-[#ded9e6] bg-white text-[#1e1b24] shadow-sm"
+            className="flex h-36 w-36 flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white text-zinc-900 shadow-sm"
             onClick={() => inputRef.current?.click()}
           >
-            <svg
-              width="34"
-              height="28"
-              viewBox="0 0 34 28"
-              fill="none"
-              aria-hidden="true"
-            >
-              <rect x="3" y="6" width="28" height="19" rx="4" stroke="#1e1b24" strokeWidth="2" />
-              <path d="M11 6l2-3h8l2 3" stroke="#1e1b24" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="17" cy="15" r="5" stroke="#1e1b24" strokeWidth="2" />
+            <svg width="34" height="28" viewBox="0 0 34 28" fill="none" aria-hidden="true">
+              <rect x="3" y="6" width="28" height="19" rx="4" stroke="#111827" strokeWidth="2" />
+              <path d="M11 6l2-3h8l2 3" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="17" cy="15" r="5" stroke="#111827" strokeWidth="2" />
             </svg>
             <span className="text-3xl leading-none">+</span>
           </button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFiles}
-          />
-          <p className="text-center text-sm text-[#2d2a33]">
-            Choisir une ou plusieurs images de votre vêtement ou idée
+          <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
+          <p className="text-center text-sm text-zinc-600">
+            Choisir une ou plusieurs images de votre vetement ou idee.
           </p>
         </div>
 
@@ -154,7 +146,7 @@ export default function DescriptionProjetPage() {
                   disabled={activeIndex === 0}
                   className="absolute -left-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg shadow disabled:opacity-40"
                 >
-                  ‹
+                  {"<"}
                 </button>
               )}
               <div className="flex w-full justify-center gap-3">
@@ -162,18 +154,14 @@ export default function DescriptionProjetPage() {
                   const absoluteIndex = activeIndex + index;
                   return (
                     <div key={`${src}-${index}`} className="relative">
-                      <img
-                        src={src}
-                        alt=""
-                        className="h-20 w-20 rounded-xl object-cover shadow-sm"
-                      />
+                      <img src={src} alt="" className="h-20 w-20 rounded-xl object-cover shadow-sm" />
                       <button
                         type="button"
                         onClick={() => handleRemove(absoluteIndex)}
-                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-sm text-[#1e1b24] shadow"
+                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-sm text-zinc-900 shadow"
                         aria-label="Supprimer cette image"
                       >
-                        ×
+                        X
                       </button>
                     </div>
                   );
@@ -186,7 +174,7 @@ export default function DescriptionProjetPage() {
                   disabled={activeIndex >= previews.length - 3}
                   className="absolute -right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg shadow disabled:opacity-40"
                 >
-                  ›
+                  {">"}
                 </button>
               )}
             </div>
@@ -198,7 +186,7 @@ export default function DescriptionProjetPage() {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Je souhaite transformer cette robe longue en jupe mi-longue..."
-            className="h-40 w-full rounded-2xl bg-[#e3dfe8] p-4 text-sm text-[#1e1b24] placeholder:text-[#7b7586] focus:outline-none"
+            className="h-40 w-full rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/20"
           />
         </div>
 
@@ -206,20 +194,14 @@ export default function DescriptionProjetPage() {
           <button
             type="button"
             onClick={handleContinue}
-            className="w-full rounded-full bg-[#3c2a5d] py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#34214f] disabled:opacity-60"
+            className="w-full rounded-full bg-cyan-950 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-900 disabled:opacity-60"
             disabled={isUploading}
           >
             {isUploading ? "Upload..." : "Continuer"}
           </button>
-          {errorMessage && (
-            <p className="mt-3 text-center text-xs text-red-600">
-              {errorMessage}
-            </p>
-          )}
+          {errorMessage && <p className="mt-3 text-center text-xs text-rose-600">{errorMessage}</p>}
         </div>
       </div>
-
-      <BottomNavClientWrapper />
     </div>
   );
 }

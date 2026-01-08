@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Search, ShoppingCart, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCart } from '@/components/CartProvider';
+import { useCart } from "@/components/CartProvider";
 
 export type ProductDetailViewModel = {
   id: number;
@@ -25,7 +25,7 @@ function deriveCategory(text: string): string {
   if (normalized.includes("robe")) return "Robes";
   if (normalized.includes("pantalon")) return "Pantalons";
   if (normalized.includes("manteau") || normalized.includes("veste")) return "Vestes";
-  return "Créations";
+  return "Creations";
 }
 
 function deriveColor(name: string, description: string): string {
@@ -37,7 +37,7 @@ function deriveColor(name: string, description: string): string {
   if (normalized.includes("vert")) return "Vert";
   if (normalized.includes("rouge")) return "Rouge";
   if (normalized.includes("beige")) return "Beige";
-  return "Non renseignée";
+  return "Non renseignee";
 }
 
 function formatPriceEUR(value: number): string {
@@ -49,13 +49,13 @@ function formatPriceEUR(value: number): string {
 }
 
 function formatRelativeTime(isoDate?: string | null): string {
-  if (!isoDate) return "Récemment";
+  if (!isoDate) return "Recemment";
   const target = new Date(isoDate).getTime();
   const diffMs = Date.now() - target;
-  if (Number.isNaN(diffMs)) return "Récemment";
+  if (Number.isNaN(diffMs)) return "Recemment";
 
   const minutes = Math.floor(diffMs / (1000 * 60));
-  if (minutes < 1) return "À l'instant";
+  if (minutes < 1) return "A l'instant";
   if (minutes < 60) return `Il y a ${minutes} minute${minutes > 1 ? "s" : ""}`;
 
   const hours = Math.floor(minutes / 60);
@@ -93,7 +93,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
 
     addToCart({
       id: product.id,
-      type: 'produit',
+      type: "produit",
       nom: product.name,
       prix: product.price,
       image: product.imagePath,
@@ -107,51 +107,49 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
   const cartItemCount = getTotalItems();
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-white text-gray-900">
-      {/* Message de confirmation */}
+    <div className="flex min-h-screen w-full flex-col text-zinc-900">
       {showAddedMessage && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg font-montserrat animate-bounce">
-          ✓ Produit ajouté au panier
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg font-montserrat animate-bounce">
+          Produit ajoute au panier
         </div>
       )}
 
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 bg-white/90 px-5 py-4 backdrop-blur md:px-8">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="rounded-full p-2 text-gray-800 transition hover:bg-gray-100"
-          aria-label="Retour"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <div className="flex items-center gap-3">
+      <main className="mx-auto flex-1 w-full max-w-6xl px-5 pb-32 pt-6 md:px-8 lg:pb-36">
+        <div className="mb-4 flex items-center justify-between">
           <button
             type="button"
-            className="rounded-full p-2 text-gray-800 transition hover:bg-gray-100"
-            aria-label="Rechercher"
+            onClick={() => router.back()}
+            className="rounded-full p-2 text-zinc-700 transition hover:bg-zinc-100"
+            aria-label="Retour"
           >
-            <Search className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5" />
           </button>
-          <button
-            type="button"
-            onClick={() => router.push('/panier')}
-            className="relative rounded-full p-2 text-gray-800 transition hover:bg-gray-100"
-            aria-label="Panier"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {cartItemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                {cartItemCount}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="rounded-full p-2 text-zinc-700 transition hover:bg-zinc-100"
+              aria-label="Rechercher"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/panier")}
+              className="relative rounded-full p-2 text-zinc-700 transition hover:bg-zinc-100"
+              aria-label="Panier"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
-      </header>
-
-      <main className="mx-auto flex-1 w-full max-w-6xl px-5 pb-32 pt-2 md:px-8 lg:pb-36">
         <div className="grid gap-8 md:grid-cols-[1.05fr,1fr] lg:grid-cols-[1.1fr,1fr] lg:gap-12">
           <div className="flex justify-center">
-            <div className="relative h-72 w-full max-w-[380px] overflow-hidden rounded-3xl bg-gray-50 shadow-sm sm:h-80 md:max-w-full lg:h-[440px]">
+            <div className="relative h-72 w-full max-w-[380px] overflow-hidden rounded-3xl bg-zinc-50 shadow-sm sm:h-80 md:max-w-full lg:h-[440px]">
               {product.imagePath ? (
                 <Image
                   src={product.imagePath}
@@ -162,8 +160,8 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                   priority
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-center text-sm font-montserrat text-gray-500">
-                  Aperçu indisponible
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200 text-center text-sm font-montserrat text-zinc-500">
+                  Apercu indisponible
                 </div>
               )}
             </div>
@@ -171,15 +169,14 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
 
           <div className="flex flex-col">
             <section className="mt-2 space-y-1 md:mt-0">
-              <h1 className="text-xl font-semibold leading-snug text-gray-900 sm:text-2xl lg:text-[1.7rem]">
+              <h1 className="text-xl font-semibold leading-snug text-zinc-900 sm:text-2xl lg:text-[1.7rem]">
                 {product.name}
               </h1>
-              <p className="text-sm text-gray-600">
-                Par{" "}
-                <span className="font-semibold text-[color:var(--color-creator,#4b2d52)]">{product.couturierName}</span>
+              <p className="text-sm text-zinc-600">
+                Par <span className="font-semibold text-cyan-950">{product.couturierName}</span>
               </p>
-              <p className="text-sm text-gray-900">
-                Taille: <span className="font-semibold text-gray-900">{selectedSize}</span>
+              <p className="text-sm text-zinc-900">
+                Taille: <span className="font-semibold text-zinc-900">{selectedSize}</span>
               </p>
             </section>
 
@@ -193,10 +190,11 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                         key={size}
                         type="button"
                         onClick={() => setSelectedSize(size)}
-                        className={`flex h-10 items-center justify-center rounded-md border text-sm font-semibold transition ${isActive
-                          ? "border-[color:var(--color-creator,#4b2d52)] bg-[color:var(--color-creator,#4b2d52)] text-white"
-                          : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
-                          }`}
+                        className={`flex h-10 items-center justify-center rounded-md border text-sm font-semibold transition ${
+                          isActive
+                            ? "border-cyan-950 bg-cyan-950 text-white"
+                            : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-300"
+                        }`}
                         aria-pressed={isActive}
                       >
                         {size}
@@ -205,10 +203,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                   })}
                 </div>
                 <div className="sm:ml-3">
-                  <button
-                    type="button"
-                    className="text-sm font-semibold text-[color:var(--color-creator,#4b2d52)] underline underline-offset-2"
-                  >
+                  <button type="button" className="text-sm font-semibold text-cyan-950 underline underline-offset-2">
                     Guide des tailles
                   </button>
                 </div>
@@ -217,9 +212,9 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
 
             <section className="mt-6 space-y-3">
               <div className="flex flex-wrap items-end gap-3">
-                <p className="text-3xl font-lusitana text-gray-900 sm:text-4xl">{priceLabel}</p>
+                <p className="text-3xl font-lusitana text-zinc-900 sm:text-4xl">{priceLabel}</p>
                 {product.stock > 0 ? (
-                  <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                     {product.stock} en stock
                   </span>
                 ) : (
@@ -229,19 +224,19 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                 )}
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm lg:p-5">
-                <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+              <div className="rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm lg:p-5">
+                <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
                   <Star className="h-4 w-4 text-amber-500" />
                   Description
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-black sm:text-base">
+                <p className="mt-2 text-sm leading-relaxed text-zinc-900 sm:text-base">
                   {expanded ? product.description || "Aucune description fournie." : shortDescription}
                 </p>
                 {showToggle && (
                   <button
                     type="button"
                     onClick={() => setExpanded((prev) => !prev)}
-                    className="mt-2 text-sm font-semibold text-[color:var(--color-creator,#4b2d52)]"
+                    className="mt-2 text-sm font-semibold text-cyan-950"
                   >
                     {expanded ? "Afficher moins" : "Plus"}
                   </button>
@@ -249,19 +244,20 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
               </div>
             </section>
 
-            <section className="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <section className="mt-6 overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
               {[
-                { label: "Catégorie", value: categoryLabel },
+                { label: "Categorie", value: categoryLabel },
                 { label: "Couleur", value: colorLabel },
-                { label: "Ajouté", value: addedAgoLabel },
+                { label: "Ajoute", value: addedAgoLabel },
               ].map((item, index) => (
                 <div
                   key={item.label}
-                  className={`flex items-center justify-between px-4 py-3 text-sm text-gray-900 sm:text-base ${index < 2 ? "border-b border-gray-200" : ""
-                    }`}
+                  className={`flex items-center justify-between px-4 py-3 text-sm text-zinc-900 sm:text-base ${
+                    index < 2 ? "border-b border-zinc-100" : ""
+                  }`}
                 >
-                  <span className="font-semibold text-gray-900">{item.label}</span>
-                  <span className="text-gray-900">{item.value}</span>
+                  <span className="font-semibold text-zinc-900">{item.label}</span>
+                  <span className="text-zinc-900">{item.value}</span>
                 </div>
               ))}
             </section>
@@ -269,19 +265,17 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-5 pb-6 pt-3 shadow-[0_-6px_30px_rgba(0,0,0,0.06)] backdrop-blur md:px-8">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-zinc-100 bg-white/95 px-5 pb-6 pt-3 shadow-[0_-6px_30px_rgba(0,0,0,0.06)] backdrop-blur md:px-8">
         <button
           type="button"
           onClick={handleAddToCart}
           disabled={product.stock <= 0}
           className={`flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold text-white transition ${
-            product.stock > 0
-              ? 'bg-[color:var(--color-creator,#4b2d52)] hover:opacity-95'
-              : 'bg-gray-400 cursor-not-allowed'
+            product.stock > 0 ? "bg-cyan-950 hover:opacity-95" : "bg-zinc-400 cursor-not-allowed"
           }`}
         >
           <ShoppingCart className="h-5 w-5" />
-          {product.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
+          {product.stock > 0 ? "Ajouter au panier" : "Rupture de stock"}
         </button>
       </div>
     </div>

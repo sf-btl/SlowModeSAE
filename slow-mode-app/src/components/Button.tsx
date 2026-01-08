@@ -20,8 +20,9 @@ export default function Button({
   const baseClasses = "transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
   
   const variantClasses = {
-    primary: "w-full bg-cyan-950 text-white py-3 px-4 rounded-2xl hover:bg-cyan-950/95 font-lusitana text-lg",
-    link: "text-sm font-bold font-istok-web text-cyan-950 hover:text-cyan-950/80 inline"
+    primary:
+      "w-full bg-cyan-950 text-white py-3 px-4 rounded-full hover:bg-cyan-900 font-montserrat text-sm font-semibold",
+    link: "text-sm font-bold font-istok-web text-cyan-950 hover:text-cyan-950/80 inline",
   }
 
   return (

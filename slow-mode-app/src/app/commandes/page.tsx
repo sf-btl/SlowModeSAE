@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import BottomNavClientWrapper from "@/components/BottomNavClientWrapper";
-import Header from "@/components/Header";
 
 type CommandeItem = {
   id: number;
@@ -32,15 +30,18 @@ export default function CommandesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white pb-24 font-montserrat text-[#1e1b24]">
-      <Header title="Mes commandes" />
+    <div className="space-y-8 font-montserrat text-zinc-900">
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Suivi</p>
+        <h1 className="mt-3 text-3xl font-lusitana text-cyan-950">Mes commandes</h1>
+      </div>
 
-      <div className="mt-6 border-t border-gray-200">
+      <div className="rounded-3xl border border-zinc-100 bg-white/80 shadow-sm">
         {loading && (
-          <div className="px-5 py-6 text-sm text-gray-500">Chargement...</div>
+          <div className="px-6 py-6 text-sm text-zinc-500">Chargement...</div>
         )}
         {!loading && commandes.length === 0 && (
-          <div className="px-5 py-6 text-sm text-gray-500">
+          <div className="px-6 py-6 text-sm text-zinc-500">
             Aucune commande pour le moment.
           </div>
         )}
@@ -48,26 +49,22 @@ export default function CommandesPage() {
           <Link
             key={order.id}
             href={`/commandes/${order.id}`}
-            className="flex items-center justify-between border-b border-gray-200 px-5 py-4"
+            className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 last:border-b-0"
           >
             <div className="flex-1">
-              <p className="text-sm font-semibold text-[#1e1b24]">
-                {order.code}
-              </p>
-              <p className="mt-1 text-xs text-gray-600">Progression</p>
-              <div className="mt-2 h-2 w-full rounded-full bg-[#d7d4dc]">
+              <p className="text-sm font-semibold text-zinc-900">{order.code}</p>
+              <p className="mt-1 text-xs text-zinc-500">Progression</p>
+              <div className="mt-2 h-2 w-full rounded-full bg-zinc-200">
                 <div
-                  className="h-full rounded-full bg-[#3c2a5d]"
+                  className="h-full rounded-full bg-cyan-950"
                   style={{ width: `${order.progress}%` }}
                 />
               </div>
             </div>
-            <span className="ml-4 text-xl text-[#1e1b24]">›</span>
+            <span className="ml-4 text-xl text-zinc-700">{">"}</span>
           </Link>
         ))}
       </div>
-
-      <BottomNavClientWrapper />
     </div>
   );
 }
