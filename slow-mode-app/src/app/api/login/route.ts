@@ -36,6 +36,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Vérifier le format du mot de passe
+    if (!user.mot_de_passe || !user.mot_de_passe.includes(':')) {
+      return NextResponse.json(
+        { success: false, message: 'Format de mot de passe invalide' },
+        { status: 500 }
+      );
+    }
+
     // Vérifier le mot de passe
     const [salt, storedHash] = user.mot_de_passe.split(':');
     const derivedKey = await scryptAsync(password, salt, 64) as Buffer;
@@ -54,9 +62,20 @@ export async function POST(request: Request) {
     else if (user.couturier) accountType = 'couturier';
     else if (user.fournisseur) accountType = 'fournisseur';
 
+    // Vérifier qu'un type de compte existe
+    if (!accountType) {
+      return NextResponse.json(
+        { success: false, message: 'Type de compte invalide' },
+        { status: 500 }
+      );
+    }
+
+    // L'ID est déjà un nombre dans le schéma
+    const userId = user.id;
+
     // Créer le token JWT
     const token = await createToken({
-      userId: user.id,
+      userId: userId,
       email: user.email,
       nom: user.nom,
       prenom: user.prenom,
@@ -67,13 +86,13 @@ export async function POST(request: Request) {
     await setAuthCookie(token);
 
     // Connexion réussie
-    console.log('Utilisateur connecté ID:', user.id, 'Type de compte:', accountType);
+    console.log('Utilisateur connecté ID:', userId, 'Type de compte:', accountType);
     
     return NextResponse.json({
       success: true,
       message: 'Connexion réussie',
       data: {
-        id: user.id,
+        id: userId,
         email: user.email,
         nom: user.nom,
         prenom: user.prenom,

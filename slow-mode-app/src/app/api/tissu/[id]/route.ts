@@ -3,10 +3,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const id = Number(params.id);
+        // Attendre la Promise params (Next.js 16)
+        const { id: idString } = await params;
+        const id = Number(idString);
 
         if (Number.isNaN(id)) {
             return NextResponse.json(
