@@ -116,6 +116,7 @@ export default function Register() {
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [adressePostale, setAdressePostale] = useState("");
   const [ville, setVille] = useState("");
+  const [acceptedCGU, setAcceptedCGU] = useState(false);
 
   const departments = [
     { code: "01", name: "Ain" },
@@ -298,6 +299,11 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!acceptedCGU) {
+      setAlert({ type: "error", message: "Vous devez accepter les conditions d'utilisation (CGU)" });
+      return;
+    }
+
     if (!validatePasswords()) return;
 
     setAlert(null);
@@ -315,6 +321,7 @@ export default function Register() {
       password,
       phoneNumber,
       countryCode,
+      acceptedCGU,
     };
 
     try {
@@ -467,14 +474,6 @@ export default function Register() {
             icon={<PasswordIcon className="w-5 h-5" />}
           />
 
-          <div className="relative -mt-3">
-            <div className="invisible text-sm font-montserrat">Erreur placeholder</div>
-            {passwordError && (
-              <div className="absolute top-0 left-0 text-rose-800 text-xs font-montserrat">
-                {passwordError}
-              </div>
-            )}
-          </div>
 
           <div className="flex">
             <select
@@ -506,6 +505,20 @@ export default function Register() {
           </div>
 
           <Button type="submit">Confirmer</Button>
+
+          <div className="mt-4 flex items-start gap-3">
+            <input
+              id="acceptedCGU"
+              name="acceptedCGU"
+              type="checkbox"
+              checked={acceptedCGU}
+              onChange={(e) => setAcceptedCGU(e.target.checked)}
+              className="h-4 w-4 rounded border-zinc-300 text-cyan-950 focus:ring-cyan-900"
+            />
+            <label htmlFor="acceptedCGU" className="text-sm font-montserrat text-zinc-700">
+              J'ai lu et j'accepte les <a href="/cgu" target="_blank" className="underline text-cyan-900">Conditions Générales d'Utilisation</a>
+            </label>
+          </div>
 
           <div className="text-center text-sm font-montserrat text-zinc-700">
             Deja un compte ?{" "}
