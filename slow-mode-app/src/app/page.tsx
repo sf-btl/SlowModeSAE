@@ -9,7 +9,7 @@ export default function Home() {
           <Link href="/" className="font-lusitana text-xl tracking-[0.3em] text-cyan-950">
             SLOWMODE
           </Link>
-          <nav className="hidden items-center gap-8 text-sm font-istok-web uppercase tracking-wide text-zinc-700 lg:flex">
+            <nav className="hidden items-center gap-8 text-sm font-istok-web uppercase tracking-wide text-zinc-700 lg:flex">
             <a href="#projet" className="hover:text-cyan-950 transition-colors">
               Projet
             </a>
@@ -19,6 +19,9 @@ export default function Home() {
             <a href="#impact" className="hover:text-cyan-950 transition-colors">
               Impact
             </a>
+            <Link href="/cgu" className="hover:text-cyan-950 transition-colors">
+              CGU
+            </Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link

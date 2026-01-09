@@ -26,6 +26,7 @@ export default function AppHeader() {
     ...(actionItem ? [actionItem] : []),
     { href: "/annuaire", label: "Annuaire" },
     { href: "/commandes", label: "Commandes" },
+    { href: "/cgu", label: "CGU" },
   ];
 
   return (
