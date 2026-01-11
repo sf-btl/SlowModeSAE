@@ -9,6 +9,8 @@ type UserProfile = {
   navn: string;
   role: string;
   description: string;
+  adresse_postale: string | null;
+  ville: string | null;
   posts: {
     id: number;
     photo_resultat: string | null;
@@ -80,8 +82,8 @@ export default function PublicProfilPage({ params }: { params: Promise<{ id: str
     profile.role === "couturier"
       ? "Createur de qualite"
       : profile.role === "fournisseur"
-      ? "Fournisseur engage"
-      : "Membre SlowMode";
+        ? "Fournisseur engage"
+        : "Membre SlowMode";
 
   return (
     <div className="space-y-8 font-montserrat text-zinc-900">
@@ -111,8 +113,8 @@ export default function PublicProfilPage({ params }: { params: Promise<{ id: str
               {profile.ville && profile.ville.trim() !== ""
                 ? profile.ville
                 : profile.adresse_postale && profile.adresse_postale.trim() !== ""
-                ? profile.adresse_postale
-                : "Localite non renseignee"}
+                  ? profile.adresse_postale
+                  : "Localite non renseignee"}
             </span>
           </div>
 
