@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Field = {
@@ -46,7 +46,7 @@ const CATEGORY_FIELDS: Record<string, Field[]> = {
   ],
 };
 
-export default function MensurationsPage() {
+function MensurationsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = searchParams.get("category") ?? "tops";
@@ -142,5 +142,13 @@ export default function MensurationsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MensurationsPage() {
+  return (
+    <Suspense>
+      <MensurationsContent />
+    </Suspense>
   );
 }

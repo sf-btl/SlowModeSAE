@@ -1,9 +1,10 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export default function ChoisirTissuPage() {
+function ChoisirTissuContent() {
   const searchParams = useSearchParams();
   const category = searchParams.get("category");
 
@@ -41,5 +42,13 @@ export default function ChoisirTissuPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ChoisirTissuPage() {
+  return (
+    <Suspense>
+      <ChoisirTissuContent />
+    </Suspense>
   );
 }

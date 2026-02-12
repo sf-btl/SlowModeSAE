@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function NouveauProjetPage() {
+function NouveauProjetContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const couturierId = searchParams.get("couturierId");
@@ -62,5 +62,13 @@ export default function NouveauProjetPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NouveauProjetPage() {
+  return (
+    <Suspense>
+      <NouveauProjetContent />
+    </Suspense>
   );
 }

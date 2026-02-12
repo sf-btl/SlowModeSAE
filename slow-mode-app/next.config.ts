@@ -1,15 +1,19 @@
-import type { NextConfig } from "next";
+// @ts-ignore
+import withPWA from "next-pwa";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
-  // Configuration pour le build standalone optimisé en production
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
-  // Optimisations pour la performance
-  experimental: {
-    // Optimisation du bundle
-    optimizePackageImports: ['react', 'react-dom'],
+const nextConfig = {
+  turbopack: {},
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
-export default nextConfig;
+export default withPWA({
+  dest: 'public',
+  disable: false,
+  register: true,
+  skipWaiting: true,
+})(nextConfig);

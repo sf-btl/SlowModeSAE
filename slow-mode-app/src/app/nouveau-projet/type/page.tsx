@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Category = {
@@ -70,7 +70,7 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-export default function ChoisirTypeVetementPage() {
+function ChoisirTypeVetementContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") as "creation" | "retouche" | null;
@@ -160,5 +160,13 @@ export default function ChoisirTypeVetementPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ChoisirTypeVetementPage() {
+  return (
+    <Suspense>
+      <ChoisirTypeVetementContent />
+    </Suspense>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function DescriptionProjetPage() {
+function DescriptionProjetContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = searchParams.get("category");
@@ -203,5 +203,13 @@ export default function DescriptionProjetPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DescriptionProjetPage() {
+  return (
+    <Suspense>
+      <DescriptionProjetContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Heart, Package } from "lucide-react";
 
@@ -65,7 +65,7 @@ const formatPriceEUR = (value: number) =>
     minimumFractionDigits: 2,
   }).format(value);
 
-export default function FeedPage() {
+function FeedPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const selectionMode = searchParams.get("selection") === "1";
@@ -397,5 +397,22 @@ export default function FeedPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin h-12 w-12 border-4 border-cyan-950 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-zinc-600 font-montserrat">Chargement...</p>
+          </div>
+        </div>
+      }
+    >
+      <FeedPageContent />
+    </Suspense>
   );
 }

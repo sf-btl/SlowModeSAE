@@ -12,7 +12,7 @@ function formatStatusLabel(statut: string) {
 
 export async function GET(
   req: Request,
-  { params }: { params?: { id?: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -23,9 +23,10 @@ export async function GET(
       );
     }
 
+    const { id: paramId } = await params;
     const url = new URL(req.url);
     const pathId = url.pathname.split("/").filter(Boolean).pop() ?? "";
-    const rawId = params?.id ?? pathId;
+    const rawId = paramId ?? pathId;
     const normalized = rawId.startsWith("CMD-")
       ? rawId.replace("CMD-", "")
       : rawId;
@@ -138,15 +139,16 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params?: { id?: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ success: false, message: "Non authentifié" }, { status: 401 });
 
+    const { id: paramId } = await params;
     const url = new URL(req.url);
     const pathId = url.pathname.split("/").filter(Boolean).pop() ?? "";
-    const rawId = params?.id ?? pathId;
+    const rawId = paramId ?? pathId;
     const normalized = rawId.startsWith("CMD-") ? rawId.replace("CMD-", "") : rawId;
     const commandeId = Number(normalized);
     if (Number.isNaN(commandeId)) return NextResponse.json({ success: false, message: "Identifiant invalide." }, { status: 400 });
